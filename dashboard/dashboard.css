@@ -14,7 +14,7 @@ h1 {
   margin-top: 0;
 }
 
-#none {
+#none, .hidden {
   display: none;
 }
 
@@ -43,4 +43,8 @@ h1 {
 
 .fail {
   background-color: #CC33CC;
+}
+
+#debugLog {
+  display: none;
 }

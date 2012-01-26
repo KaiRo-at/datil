@@ -50,15 +50,16 @@ var gProductData = {
   fennec: {
     name: "Mobile (XUL)",
     abbr: "fn",
+    noflash: true,
     channels: {
       nightly: {
         name: "Nightly",
         version: "12.0a1",
         sumversion: "12",
-        rate: { high: 2, max: 3 }, // crashes per 100 ADU
-        startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: 20, max: 30 }, // total Flash hangs
-        flashcrash: { high: 3, max: 5 }, // percentage of crashes that comes from Flash
+        rate: { high: 2, max: 3 },
+        startup: { high: 20, max: 30 },
+        flashhang: { high: 20, max: 30 },
+        flashcrash: { high: 3, max: 5 },
       },
       aurora: {
         name: "Aurora",
@@ -94,6 +95,7 @@ var gProductData = {
   fennecandroid: {
     name: "Fennec Android (native)",
     abbr: "fna",
+    noflash: true,
     channels: {
       nightly: {
         name: "Nightly",
@@ -122,29 +124,29 @@ var gSources = {
     precision: 2,
     percent: false,
     getCrashesFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" + aProd.channels[aChannel].sumversion + "-total.csv";
+      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
+             aProd.channels[aChannel].sumversion + "-total.csv";
     },
     getADUFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" + aProd.channels[aChannel].sumversion + "-adu.csv";
+      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
+             aProd.channels[aChannel].sumversion + "-adu.csv";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       var src = this;
-      var cXHR = new XMLHttpRequest();
-      cXHR.onreadystatechange = function() { checkReadyXHR(cXHR, function(aCrashes) {
-        if (!aCrashes)
-          aCallback(null, aCBData);
-        var uXHR = new XMLHttpRequest();
-        uXHR.onreadystatechange = function() { checkReadyXHR(uXHR, function(aADU) {
-          if (!aADU)
-            aCallback(null, aCBData);
-          else
-            aCallback(aCrashes / aADU * 100, aCBData);
-        });};
-        uXHR.open("GET", src.getADUFile(aProd, aChannel));
-        uXHR.send();
-      });};
-      cXHR.open("GET", src.getCrashesFile(aProd, aChannel));
-      cXHR.send();
+      fetchFile(src.getCrashesFile(aProd, aChannel), "",
+          function(aCrashes) {
+            if (!aCrashes)
+              aCallback(null, aCBData);
+            fetchFile(src.getADUFile(aProd, aChannel), "",
+                function(aADU) {
+                  if (!aADU)
+                    aCallback(null, aCBData);
+                  else
+                    aCallback(aCrashes / aADU * 100, aCBData);
+                }
+            );
+          }
+      );
     },
   },
   startup: {
@@ -152,70 +154,71 @@ var gSources = {
     percent: true,
     getStartupFile: function(aProd, aChannel) {
       if (aProd.channels[aChannel].appendver)
-        return gAnalysisPath + aProd.abbr + "-" + aChannel + "-" + aProd.channels[aChannel].version + ".startup.json";
+        return gAnalysisPath + aProd.abbr + "-" + aChannel + "-" +
+               aProd.channels[aChannel].version + ".startup.json";
       else
         return gAnalysisPath + aProd.abbr + "-" + aChannel + ".startup.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      var src = this;
-      var XHR = new XMLHttpRequest();
-      XHR.onreadystatechange = function() { checkReadyXHR(XHR, function(aData) {
-        if (!aData || !aData[gDay])
-          aCallback(null, aCBData);
-        else
-          aCallback(aData[gDay].startup.browser / aData[gDay].total * 100, aCBData);
-      }, "json");};
-      XHR.open("GET", src.getStartupFile(aProd, aChannel));
-      XHR.send();
+      fetchFile(this.getStartupFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay])
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[gDay].startup.browser ?
+                        aData[gDay].startup.browser / aData[gDay].total * 100 :
+                        0, aCBData);
+          }
+      );
     },
   },
   flashhang: {
     precision: 0,
     percent: false,
-    getStartupFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.abbr + "-" + aProd.channels[aChannel].version + ".flashhang.json";
+    getFlashHangFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.abbr + "-" +
+             aProd.channels[aChannel].version + ".flashhang.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      var src = this;
-      var XHR = new XMLHttpRequest();
-      XHR.onreadystatechange = function() { checkReadyXHR(XHR, function(aData) {
-        if (!aData || !aData[gDay])
-          aCallback(null, aCBData);
-        else
-          aCallback(aData[gDay].total_flash.hang, aCBData);
-      }, "json");};
-      XHR.open("GET", src.getStartupFile(aProd, aChannel));
-      XHR.send();
+      fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay])
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[gDay].total_flash.hang, aCBData);
+          }
+      );
     },
   },
   flashcrash: {
     precision: 1,
     percent: true,
-    getStartupFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.abbr + "-" + aProd.channels[aChannel].version + ".flashhang.json";
+    getFlashHangFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.abbr + "-" +
+             aProd.channels[aChannel].version + ".flashhang.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      var src = this;
-      var XHR = new XMLHttpRequest();
-      XHR.onreadystatechange = function() { checkReadyXHR(XHR, function(aData) {
-        if (!aData || !aData[gDay])
-          aCallback(null, aCBData);
-        else
-          aCallback(aData[gDay].total_flash.crash / aData[gDay].total.crash * 100, aCBData);
-      }, "json");};
-      XHR.open("GET", src.getStartupFile(aProd, aChannel));
-      XHR.send();
+      fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay])
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[gDay].total_flash.crash / aData[gDay].total.crash * 100,
+                        aCBData);
+          }
+      );
     },
   },
 }
 
-var gDebug;
+var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
 var gAnalysisPath = "../../";
 
 window.onload = function() {
   gDebug = document.getElementById("debug");
+  gLog = document.getElementById("debugLog");
 
   // Get date to analyze.
   var anadate = new Date();
@@ -252,9 +255,14 @@ function processData() {
       versionrow.appendChild(createCell(cdata.version));
       for (var source in gSources) {
         var sourcerow = sect.getElementsByClassName(source)[0];
-        var sourceCell = sourcerow.appendChild(createCell(""));
-        gSources[source].getValue(gProductData[product], channel, valueCallback,
-            {cell: sourceCell, data: cdata, type: source});
+        if (source.indexOf("flash") !== -1 && gProductData[product].noflash) {
+          sourcerow.classList.add("hidden");
+        }
+        else {
+          var sourceCell = sourcerow.appendChild(createCell(""));
+          gSources[source].getValue(gProductData[product], channel, valueCallback,
+              {cell: sourceCell, data: cdata, type: source});
+        }
       }
       //gDebug.textContent = channel.name;
     }
@@ -267,26 +275,35 @@ function createCell(aText, aHeader) {
   return cell;
 }
 
-function checkReadyXHR(aXHR, aCallback, aType) {
-  if(aXHR.readyState == 4 && aXHR.status == 200) {
-    // so far so good
-    if(aXHR.responseXML != null && aType == "xml" && aXHR.responseXML.getElementById('test').firstChild.data)
-      // success!
-      aCallback(aXHR.responseXML.getElementById('test').firstChild.data);
-    else if(aXHR.responseText != null && aType == "json")
-      // success!
-      aCallback(JSON.parse(aXHR.responseText));
-    else
-      aCallback(aXHR.responseText);
-  } else if (aXHR.readyState == 4 && aXHR.status != 200) {
-    // fetched the wrong page or network error...
-    aCallback(null);
-  }
+function fetchFile(aURL, aFormat, aCallback) {
+  var XHR = new XMLHttpRequest();
+  XHR.onreadystatechange = function() {
+    if (XHR.readyState == 4) {
+      gLog.appendChild(document.createElement("li"))
+          .appendChild(document.createTextNode(aURL + " - " + XHR.status +
+                                               " " + XHR.statusText));
+    }
+    if (XHR.readyState == 4 && XHR.status == 200) {
+      // so far so good
+      if (XHR.responseXML != null && aFormat == "xml" &&
+          XHR.responseXML.getElementById('test').firstChild.data)
+        aCallback(aXHR.responseXML.getElementById('test').firstChild.data);
+      else if (XHR.responseText != null && aFormat == "json")
+        aCallback(JSON.parse(XHR.responseText));
+      else
+        aCallback(XHR.responseText);
+    } else if (XHR.readyState == 4 && XHR.status != 200) {
+      // fetched the wrong page or network error...
+      aCallback(null);
+    }
+  };
+  XHR.open("GET", aURL);
+  XHR.send();
 }
 
 function valueCallback(aValue, aCBData) {
   aCBData.data.current = aValue;
-  if (aValue) {
+  if (aValue !== null) {
     aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
     if (gSources[aCBData.type].percent)
       aCBData.cell.textContent += "%";
