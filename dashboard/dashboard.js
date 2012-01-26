@@ -40,7 +40,7 @@ var gProductData = {
         version: "9.0",
         sumversion: "9",
         appendver: true,
-        rate: { high: 2, max: 2.5 },
+        rate: { factor: 10, high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
         flashcrash: { high: 10, max: 13 },
@@ -142,7 +142,11 @@ var gSources = {
                   if (!aADU)
                     aCallback(null, aCBData);
                   else
-                    aCallback(aCrashes / aADU * 100, aCBData);
+                    aCallback(aCrashes / aADU * 100 *
+                                (aProd.channels[aChannel].rate.factor ?
+                                 aProd.channels[aChannel].rate.factor :
+                                 1),
+                              aCBData);
                 }
             );
           }
