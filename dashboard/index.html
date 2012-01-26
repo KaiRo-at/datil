@@ -1,0 +1,34 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Stability Dashboard</title>
+  <script src="dashboard.js"></script>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<h1>Stability Dashboard</h1>
+<p id="dateLine">Analyzed date: <span id="repDay"></span></p>
+
+<div id="dashboard">
+<section id="none">
+<h2></h2>
+
+<table border="1">
+<tr class="headers"><th rowspan="2">Branch</th></tr>
+<tr class="versions"></tr>
+<tr class="rate"><th>Rate</th></tr>
+<tr class="startup"><th>Startup</th></tr>
+<tr class="flashhang"><th>Flash hangs</th></tr>
+<tr class="flashcrash"><th>Flash crashes</th></tr>
+</table>
+</section>
+</div>
+
+<p id="debug"></p>
+</body>
+</html>
