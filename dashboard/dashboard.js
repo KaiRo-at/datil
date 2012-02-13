@@ -9,8 +9,8 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "12.0a1",
-        sumversion: "12",
+        version: "13.0a1",
+        sumversion: "13",
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: 20, max: 30 }, // total Flash hangs
@@ -18,8 +18,8 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "11.0a2",
-        sumversion: "11",
+        version: "12.0a2",
+        sumversion: "12",
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -27,8 +27,8 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "10.0",
-        sumversion: "10",
+        version: "11.0",
+        sumversion: "11",
         appendver: true,
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
@@ -37,8 +37,8 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "9.0",
-        sumversion: "9",
+        version: "10.0",
+        sumversion: "10",
         appendver: true,
         rate: { factor: 10, high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
@@ -54,8 +54,8 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "12.0a1",
-        sumversion: "12",
+        version: "13.0a1",
+        sumversion: "13",
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -63,8 +63,8 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "11.0a2",
-        sumversion: "11",
+        version: "12.0a2",
+        sumversion: "12",
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -72,8 +72,8 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "10.0",
-        sumversion: "10",
+        version: "11.0",
+        sumversion: "11",
         appendver: true,
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
@@ -82,8 +82,8 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "9.0",
-        sumversion: "9",
+        version: "10.0",
+        sumversion: "10",
         appendver: true,
         rate: { high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
@@ -99,8 +99,8 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "12.0a1",
-        sumversion: "12",
+        version: "13.0a1",
+        sumversion: "13",
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -108,12 +108,22 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "11.0a2",
-        sumversion: "11",
+        version: "12.0a2",
+        sumversion: "12",
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 100, max: 150 },
         flashcrash: { high: 4, max: 7 },
+      },
+      beta: {
+        name: "Beta",
+        version: "11.0",
+        sumversion: "11",
+        appendver: true,
+        rate: { high: 2, max: 2.5 },
+        startup: { high: 20, max: 25 },
+        flashhang: { high: 500, max: 700 },
+        flashcrash: { high: 5, max: 7 },
       },
     },
   },
