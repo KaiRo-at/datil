@@ -348,10 +348,12 @@ function valueCallback(aValue, aCBData) {
     if (gSources[aCBData.type].unit)
       aCBData.cell.textContent += gSources[aCBData.type].unit;
     aCBData.cell.classList.add("num");
-    if (((lowLimits) && (aValue < aCBData.data[aCBData.type].min)) ||
+    if (((gSources[aCBData.type].lowLimits) &&
+         (aValue < aCBData.data[aCBData.type].min)) ||
         (aValue > aCBData.data[aCBData.type].max))
       aCBData.cell.classList.add("faroff");
-    else if (((lowLimits) && (aValue < aCBData.data[aCBData.type].low)) ||
+    else if (((gSources[aCBData.type].lowLimits) &&
+              (aValue < aCBData.data[aCBData.type].low)) ||
              (aValue > aCBData.data[aCBData.type].high))
       aCBData.cell.classList.add("outside");
     else
