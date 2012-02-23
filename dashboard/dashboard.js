@@ -84,7 +84,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "10.0",
+        version: "10.0.2",
         appendver: true,
         adu: { low: 5e5, min: 1e5 },
         rate: { high: 2, max: 2.5 },
@@ -157,32 +157,23 @@ var gSources = {
     precision: 2,
     unit: "",
     lowLimits: false,
-    getCrashesFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             majVer(aProd.channels[aChannel].version) + "-total.csv";
-    },
-    getADUFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             majVer(aProd.channels[aChannel].version) + "-adu.csv";
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-daily.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      var src = this;
-      fetchFile(src.getCrashesFile(aProd, aChannel), "",
-          function(aCrashes) {
-            if (!aCrashes)
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[aProd.channels[aChannel].version] ||
+                !aData[aProd.channels[aChannel].version][gDay]) {
               aCallback(null, aCBData);
-            fetchFile(src.getADUFile(aProd, aChannel), "",
-                function(aADU) {
-                  if (!aADU)
-                    aCallback(null, aCBData);
-                  else
-                    aCallback(aCrashes / aADU * 100 *
-                                (aProd.channels[aChannel].rate.factor ?
-                                 aProd.channels[aChannel].rate.factor :
-                                 1),
-                              aCBData);
-                }
-            );
+            }
+            else {
+              var crashes = parseInt(aData[aProd.channels[aChannel].version][gDay].crashes);
+              var adu = parseInt(aData[aProd.channels[aChannel].version][gDay].adu);
+              var factor = aProd.channels[aChannel].rate.factor ?
+                           aProd.channels[aChannel].rate.factor : 1;
+              aCallback((adu ? crashes / adu : 0) * 100 * factor, aCBData);
+            }
           }
       );
     },
