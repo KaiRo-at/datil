@@ -11,7 +11,7 @@ var gProductData = {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        adu: { low: 100, min: 70 }, // k ADUs
+        adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: 20, max: 30 }, // total Flash hangs
@@ -20,7 +20,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        adu: { low: 1000, min: 125 },
+        adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -30,7 +30,7 @@ var gProductData = {
         name: "Beta",
         version: "11.0b3",
         appendver: true,
-        adu: { low: 10000, min: 1000 },
+        adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -40,7 +40,7 @@ var gProductData = {
         name: "Release",
         version: "10.0.2",
         appendver: true,
-        adu: { low: 100000, min: 10000 },
+        adu: { low: 1e8, min: 1e7 },
         rate: { factor: 10, high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
@@ -57,7 +57,7 @@ var gProductData = {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        adu: { low: 1, min: .1 },
+        adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -66,7 +66,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        adu: { low: 1, min: .1 },
+        adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -76,7 +76,7 @@ var gProductData = {
         name: "Beta",
         version: "11.0b3",
         appendver: true,
-        adu: { low: 100, min: 10 },
+        adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -86,7 +86,7 @@ var gProductData = {
         name: "Release",
         version: "10.0",
         appendver: true,
-        adu: { low: 500, min: 100 },
+        adu: { low: 5e5, min: 1e5 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
@@ -103,7 +103,7 @@ var gProductData = {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        adu: { low: 1, min: .1 },
+        adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -112,7 +112,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        adu: { low: 10, min: 1 },
+        adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 100, max: 150 },
@@ -122,7 +122,7 @@ var gProductData = {
         name: "Beta",
         version: "11.0b3",
         appendver: true,
-        adu: { low: 100, min: 10 },
+        adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -134,8 +134,8 @@ var gProductData = {
 
 var gSources = {
   adu: {
-    precision: 0,
-    unit: "k",
+    precision: null,
+    unit: "kMG",
     lowLimits: true,
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-daily.json";
@@ -147,7 +147,7 @@ var gSources = {
                 !aData[aProd.channels[aChannel].version][gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[aProd.channels[aChannel].version][gDay].adu / 1000,
+              aCallback(aData[aProd.channels[aChannel].version][gDay].adu,
                         aCBData);
           }
       );
@@ -345,9 +345,50 @@ function fetchFile(aURL, aFormat, aCallback) {
 function valueCallback(aValue, aCBData) {
   aCBData.data[aCBData.type].current = aValue;
   if (aValue !== null) {
-    aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
-    if (gSources[aCBData.type].unit)
-      aCBData.cell.textContent += gSources[aCBData.type].unit;
+    if (gSources[aCBData.type].unit == "kMG") {
+      var val = aValue;
+      var prec = gSources[aCBData.type].precision;
+      var unit = "";
+      if (aValue > 1e10) {
+        prec = (prec === null) ? 0 : prec;
+        val = (val / 1e9).toFixed(prec);
+        unit = "G";
+      }
+      else if (aValue > 1e9) {
+        prec = (prec === null) ? 1 : prec;
+        val = (val / 1e9).toFixed(prec);
+        unit = "G";
+      }
+      else if (aValue > 1e7) {
+        prec = (prec === null) ? 0 : prec;
+        val = (val / 1e6).toFixed(prec);
+        unit = "M";
+      }
+      else if (aValue > 1e6) {
+        prec = (prec === null) ? 1 : prec;
+        val = (val / 1e6).toFixed(prec);
+        unit = "M";
+      }
+      else if (aValue > 1e4) {
+        prec = (prec === null) ? 0 : prec;
+        val = (val / 1e3).toFixed(prec);
+        unit = "k";
+      }
+      else if (aValue > 1e3) {
+        prec = (prec === null) ? 1 : prec;
+        val = (val / 1e3).toFixed(prec);
+        unit = "k";
+      }
+      else if (prec !== null) {
+        val = val.toFixed(prec);
+      }
+      aCBData.cell.textContent = val + unit;
+    }
+    else {
+      aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
+      if (gSources[aCBData.type].unit)
+        aCBData.cell.textContent += gSources[aCBData.type].unit;
+    }
     aCBData.cell.classList.add("num");
     if (((gSources[aCBData.type].lowLimits) &&
          (aValue < aCBData.data[aCBData.type].min)) ||
