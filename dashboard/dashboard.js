@@ -14,7 +14,7 @@ var gProductData = {
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: 75, max: 100 }, // total Flash hangs
+        flashhang: { high: 70, max: 90 }, // total Flash hangs
         flashcrash: { high: 3, max: 5 }, // percentage of crashes that comes from Flash
       },
       aurora: {
@@ -60,8 +60,6 @@ var gProductData = {
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: 20, max: 30 },
-        flashcrash: { high: 3, max: 5 },
       },
       aurora: {
         name: "Aurora",
@@ -69,8 +67,6 @@ var gProductData = {
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: 100, max: 150 },
-        flashcrash: { high: 4, max: 7 },
       },
       beta: {
         name: "Beta",
@@ -79,8 +75,6 @@ var gProductData = {
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: 500, max: 700 },
-        flashcrash: { high: 5, max: 7 },
       },
       release: {
         name: "Release",
@@ -89,8 +83,6 @@ var gProductData = {
         adu: { low: 5e5, min: 1e5 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
-        flashhang: { high: 15000, max: 20000 },
-        flashcrash: { high: 10, max: 13 },
       },
     },
   },
@@ -106,8 +98,6 @@ var gProductData = {
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: 20, max: 30 },
-        flashcrash: { high: 3, max: 5 },
       },
       aurora: {
         name: "Aurora",
@@ -115,8 +105,6 @@ var gProductData = {
         adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: 100, max: 150 },
-        flashcrash: { high: 4, max: 7 },
       },
       beta: {
         name: "Beta",
@@ -125,8 +113,6 @@ var gProductData = {
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: 500, max: 700 },
-        flashcrash: { high: 5, max: 7 },
       },
     },
   },
