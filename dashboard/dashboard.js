@@ -138,7 +138,7 @@ var gSources = {
     unit: "k",
     lowLimits: true,
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.full + "-daily.json";
+      return gAnalysisPath + aProd.full + "-daily.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
