@@ -342,7 +342,7 @@ function fetchFile(aURL, aFormat, aCallback) {
 }
 
 function valueCallback(aValue, aCBData) {
-  aCBData.data.current = aValue;
+  aCBData.data[aCBData.type].current = aValue;
   if (aValue !== null) {
     aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
     if (gSources[aCBData.type].unit)
