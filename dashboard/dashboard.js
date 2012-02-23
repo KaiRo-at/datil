@@ -143,7 +143,8 @@ var gSources = {
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData || !aData[gDay])
+            if (!aData || !aData[aProd.channels[aChannel].version] ||
+                !aData[aProd.channels[aChannel].version][gDay])
               aCallback(null, aCBData);
             else
               aCallback(aData[aProd.channels[aChannel].version][gDay].adu / 1000,
