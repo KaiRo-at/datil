@@ -14,7 +14,7 @@ var gProductData = {
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: 20, max: 30 }, // total Flash hangs
+        flashhang: { high: 75, max: 100 }, // total Flash hangs
         flashcrash: { high: 3, max: 5 }, // percentage of crashes that comes from Flash
       },
       aurora: {
@@ -23,7 +23,7 @@ var gProductData = {
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: 100, max: 150 },
+        flashhang: { high: 300, max: 400 },
         flashcrash: { high: 4, max: 7 },
       },
       beta: {
@@ -33,7 +33,7 @@ var gProductData = {
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: 500, max: 700 },
+        flashhang: { high: 3000, max: 4000 },
         flashcrash: { high: 5, max: 7 },
       },
       release: {
