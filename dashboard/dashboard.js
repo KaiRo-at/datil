@@ -141,7 +141,7 @@ var gSources = {
       return gAnalysisPath + gDay + "/" + aProd.full + "-daily.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getStartupFile(aProd, aChannel), "json",
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
