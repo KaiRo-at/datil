@@ -5,12 +5,13 @@
 var gProductData = {
   firefox: {
     name: "Firefox Desktop",
+    full: "Firefox",
     abbr: "ff",
     channels: {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        sumversion: "13",
+        adu: { low: 100, min: 70 }, // k ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: 20, max: 30 }, // total Flash hangs
@@ -19,7 +20,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        sumversion: "12",
+        adu: { low: 1000, min: 125 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -27,9 +28,9 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0",
-        sumversion: "11",
+        version: "11.0b3",
         appendver: true,
+        adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -37,9 +38,9 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "10.0",
-        sumversion: "10",
+        version: "10.0.2",
         appendver: true,
+        adu: { low: 100000, min: 10000 },
         rate: { factor: 10, high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
@@ -49,13 +50,14 @@ var gProductData = {
   },
   fennec: {
     name: "Mobile (XUL)",
+    full: "Fennec",
     abbr: "fn",
     noflash: true,
     channels: {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        sumversion: "13",
+        adu: { low: 1, min: .1 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -64,7 +66,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        sumversion: "12",
+        adu: { low: 1, min: .1 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 100, max: 150 },
@@ -72,9 +74,9 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0",
-        sumversion: "11",
+        version: "11.0b3",
         appendver: true,
+        adu: { low: 100, min: 10 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -83,8 +85,8 @@ var gProductData = {
       release: {
         name: "Release",
         version: "10.0",
-        sumversion: "10",
         appendver: true,
+        adu: { low: 500, min: 100 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
@@ -94,13 +96,14 @@ var gProductData = {
   },
   fennecandroid: {
     name: "Fennec Android (native)",
+    full: "FennecAndroid",
     abbr: "fna",
     noflash: true,
     channels: {
       nightly: {
         name: "Nightly",
         version: "13.0a1",
-        sumversion: "13",
+        adu: { low: 1, min: .1 },
         rate: { high: 2, max: 3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 20, max: 30 },
@@ -109,7 +112,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "12.0a2",
-        sumversion: "12",
+        adu: { low: 10, min: 1 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 100, max: 150 },
@@ -117,9 +120,9 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0",
-        sumversion: "11",
+        version: "11.0b3",
         appendver: true,
+        adu: { low: 100, min: 10 },
         rate: { high: 2, max: 2.5 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 500, max: 700 },
@@ -130,16 +133,36 @@ var gProductData = {
 };
 
 var gSources = {
+  adu: {
+    precision: 0,
+    unit: "k",
+    lowLimits: true,
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + gDay + "/" + aProd.full + "-daily.json";
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getStartupFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay])
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[aProd.channels[aChannel].version][gDay].adu / 1000,
+                        aCBData);
+          }
+      );
+    },
+  },
   rate: {
     precision: 2,
-    percent: false,
+    unit: "",
+    lowLimits: false,
     getCrashesFile: function(aProd, aChannel) {
       return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             aProd.channels[aChannel].sumversion + "-total.csv";
+             majVer(aProd.channels[aChannel].version) + "-total.csv";
     },
     getADUFile: function(aProd, aChannel) {
       return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             aProd.channels[aChannel].sumversion + "-adu.csv";
+             majVer(aProd.channels[aChannel].version) + "-adu.csv";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       var src = this;
@@ -165,11 +188,12 @@ var gSources = {
   },
   startup: {
     precision: 0,
-    percent: true,
+    unit: "%",
+    lowLimits: false,
     getStartupFile: function(aProd, aChannel) {
       if (aProd.channels[aChannel].appendver)
         return gAnalysisPath + aProd.abbr + "-" + aChannel + "-" +
-               aProd.channels[aChannel].version + ".startup.json";
+               repVer(aProd.channels[aChannel].version) + ".startup.json";
       else
         return gAnalysisPath + aProd.abbr + "-" + aChannel + ".startup.json";
     },
@@ -188,10 +212,11 @@ var gSources = {
   },
   flashhang: {
     precision: 0,
-    percent: false,
+    unit: "",
+    lowLimits: false,
     getFlashHangFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.abbr + "-" +
-             aProd.channels[aChannel].version + ".flashhang.json";
+             repVer(aProd.channels[aChannel].version) + ".flashhang.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
@@ -206,10 +231,11 @@ var gSources = {
   },
   flashcrash: {
     precision: 1,
-    percent: true,
+    unit: "%",
+    lowLimits: false,
     getFlashHangFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.abbr + "-" +
-             aProd.channels[aChannel].version + ".flashhang.json";
+             repVer(aProd.channels[aChannel].version) + ".flashhang.json";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
@@ -319,13 +345,15 @@ function valueCallback(aValue, aCBData) {
   aCBData.data.current = aValue;
   if (aValue !== null) {
     aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
-    if (gSources[aCBData.type].percent)
-      aCBData.cell.textContent += "%";
+    if (gSources[aCBData.type].unit)
+      aCBData.cell.textContent += gSources[aCBData.type].unit;
     aCBData.cell.classList.add("num");
-    if (aValue > aCBData.data[aCBData.type].max)
-      aCBData.cell.classList.add("max");
-    else if (aValue > aCBData.data[aCBData.type].high)
-      aCBData.cell.classList.add("high");
+    if (((lowLimits) && (aValue < aCBData.data[aCBData.type].min)) ||
+        (aValue > aCBData.data[aCBData.type].max))
+      aCBData.cell.classList.add("faroff");
+    else if (((lowLimits) && (aValue < aCBData.data[aCBData.type].low)) ||
+             (aValue > aCBData.data[aCBData.type].high))
+      aCBData.cell.classList.add("outside");
     else
       aCBData.cell.classList.add("normal");
   }
@@ -333,4 +361,19 @@ function valueCallback(aValue, aCBData) {
     aCBData.cell.textContent = "ERR";
     aCBData.cell.classList.add("fail");
   }
+}
+
+function majVer(aVersion) {
+  // returns major version, e.g. 11 for 11.0b3, 13 for 13.0a1, 10 for 10.0.2
+  return aVersion.match(/^\d+/);
+}
+
+function repVer(aVersion) {
+  // returns a report version, e.g. 11.0 for 11.0b3, 13.0a1 for 13.0a1, 10.0 for 10.0.2
+  return aVersion.match(/^\d+\.[\da]+/);
+}
+
+function intVer(aVersion) {
+  // returns the internal version, e.g. 11.0 for 11.0b3, 13.0a1 for 13.0a1, 10.0.2 for 10.0.2
+  return aVersion.match(/^[\d\.a]+/);
 }
