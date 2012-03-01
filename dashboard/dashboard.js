@@ -182,7 +182,7 @@ var gSources = {
     getSigCntFile: function(aProd, aChannel) {
       return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
              (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel) +
-             "-total.csv";
+             "-sigcnt.csv";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getSigCntFile(aProd, aChannel), "",
