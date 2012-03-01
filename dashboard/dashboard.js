@@ -13,6 +13,7 @@ var gProductData = {
         version: "13.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
+        sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: 70, max: 90 }, // total Flash hangs
         flashcrash: { high: 3, max: 5 }, // percentage of crashes that comes from Flash
@@ -22,6 +23,7 @@ var gProductData = {
         version: "12.0a2",
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 20, max: 30 },
         flashhang: { high: 300, max: 400 },
         flashcrash: { high: 4, max: 7 },
@@ -32,6 +34,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 7e3, max: 9e3 },
         startup: { high: 20, max: 25 },
         flashhang: { high: 3000, max: 4000 },
         flashcrash: { high: 5, max: 7 },
@@ -42,6 +45,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 10, high: 2, max: 2.5 },
+        sigcnt: { high: 1.5e4, max: 2e4 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
         flashcrash: { high: 10, max: 13 },
@@ -59,6 +63,7 @@ var gProductData = {
         version: "13.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
+        sigcnt: { high: 10, max: 15 },
         startup: { high: 20, max: 30 },
       },
       aurora: {
@@ -66,6 +71,7 @@ var gProductData = {
         version: "12.0a2",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 10, max: 15 },
         startup: { high: 20, max: 30 },
       },
       beta: {
@@ -74,6 +80,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 60, max: 80 },
         startup: { high: 20, max: 25 },
       },
       release: {
@@ -82,6 +89,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 5e5, min: 1e5 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 400, max: 500 },
         startup: { high: 15, max: 20 },
       },
     },
@@ -97,6 +105,7 @@ var gProductData = {
         version: "13.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
+        sigcnt: { high: 40, max: 60 },
         startup: { high: 20, max: 30 },
       },
       aurora: {
@@ -104,6 +113,7 @@ var gProductData = {
         version: "12.0a2",
         adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 40, max: 60 },
         startup: { high: 20, max: 25 },
       },
       beta: {
@@ -112,6 +122,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
+        sigcnt: { high: 40, max: 60 },
         startup: { high: 20, max: 25 },
       },
     },
@@ -160,6 +171,26 @@ var gSources = {
                            aProd.channels[aChannel].rate.factor : 1;
               aCallback((adu ? crashes / adu : 0) * 100 * factor, aCBData);
             }
+          }
+      );
+    },
+  },
+  sigcnt: {
+    precision: 0,
+    unit: "",
+    lowLimits: false,
+    getSigCntFile: function(aProd, aChannel) {
+      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
+             (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel) +
+             "-total.csv";
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(src.getSigCntFile(aProd, aChannel), "",
+          function(aSigCnt) {
+            if (!aSigCnt)
+              aCallback(null, aCBData);
+            else
+              aCallback(aSigCnt, aCBData);
           }
       );
     },
