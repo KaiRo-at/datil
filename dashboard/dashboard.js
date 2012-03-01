@@ -190,7 +190,7 @@ var gSources = {
             if (!aSigCnt)
               aCallback(null, aCBData);
             else
-              aCallback(aSigCnt, aCBData);
+              aCallback(parseInt(aSigCnt), aCBData);
           }
       );
     },
