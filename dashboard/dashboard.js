@@ -185,7 +185,7 @@ var gSources = {
              "-total.csv";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(src.getSigCntFile(aProd, aChannel), "",
+      fetchFile(this.getSigCntFile(aProd, aChannel), "",
           function(aSigCnt) {
             if (!aSigCnt)
               aCallback(null, aCBData);
