@@ -134,6 +134,9 @@ var gSources = {
     precision: null,
     unit: "kMG",
     lowLimits: true,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " + aProd.channels[aChannel].version;
+    },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-daily.json";
     },
@@ -154,6 +157,9 @@ var gSources = {
     precision: 2,
     unit: "",
     lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " + aProd.channels[aChannel].version;
+    },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-daily.json";
     },
@@ -179,6 +185,10 @@ var gSources = {
     precision: 0,
     unit: "",
     lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " +
+             (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel);
+    },
     getSigCntFile: function(aProd, aChannel) {
       return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
              (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel) +
@@ -199,6 +209,12 @@ var gSources = {
     precision: 0,
     unit: "%",
     lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      if (aProd.channels[aChannel].appendver)
+        return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+      else
+        return aProd.full + " " + aChannel;
+    },
     getStartupFile: function(aProd, aChannel) {
       if (aProd.channels[aChannel].appendver)
         return gAnalysisPath + aProd.abbr + "-" + aChannel + "-" +
@@ -223,6 +239,9 @@ var gSources = {
     precision: 0,
     unit: "",
     lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+    },
     getFlashHangFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.abbr + "-" +
              repVer(aProd.channels[aChannel].version) + ".flashhang.json";
@@ -242,6 +261,9 @@ var gSources = {
     precision: 1,
     unit: "%",
     lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+    },
     getFlashHangFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.abbr + "-" +
              repVer(aProd.channels[aChannel].version) + ".flashhang.json";
@@ -309,6 +331,11 @@ function processData() {
         }
         else {
           var sourceCell = sourcerow.appendChild(createCell(""));
+          sourceCell.addEventListener("mouseover", showInfo, false);
+          sourceCell.addEventListener("mouseout", hideInfo, false);
+          sourceCell.dataset.product = product;
+          sourceCell.dataset.channel = channel;
+          sourceCell.dataset.source = source;
           gSources[source].getValue(gProductData[product], channel, valueCallback,
               {cell: sourceCell, data: cdata, type: source});
         }
@@ -324,13 +351,75 @@ function createCell(aText, aHeader) {
   return cell;
 }
 
+function showInfo(event) {
+  var cell = event.target;
+  var info = document.getElementById("infobox");
+
+  // Position: The parent is the table and has the offset within the body.
+  info.style.left = (cell.offsetParent.offsetLeft +
+                     cell.offsetLeft - 1) + "px";
+  info.style.top = (cell.offsetParent.offsetTop +
+                    cell.offsetTop + cell.offsetHeight - 1) + "px";
+
+  // Set info to show.
+  info.getElementsByClassName(cell.dataset.source)[0].classList.add("current");
+
+  var limits = gProductData[cell.dataset.product]
+               .channels[cell.dataset.channel][cell.dataset.source];
+  if (gSources[cell.dataset.source].lowLimits) {
+    info.getElementsByClassName("limits")[0].classList.add("low");
+    document.getElementById("limit1").textContent =
+        formatValue(limits.low,
+                    gSources[cell.dataset.source].precision,
+                    gSources[cell.dataset.source].unit);
+    document.getElementById("limit2").textContent =
+        formatValue(limits.min,
+                    gSources[cell.dataset.source].precision,
+                    gSources[cell.dataset.source].unit);
+  }
+  else {
+    info.getElementsByClassName("limits")[0].classList.add("high");
+    document.getElementById("limit1").textContent =
+        formatValue(limits.high,
+                    gSources[cell.dataset.source].precision,
+                    gSources[cell.dataset.source].unit);
+    document.getElementById("limit2").textContent =
+        formatValue(limits.max,
+                    gSources[cell.dataset.source].precision,
+                    gSources[cell.dataset.source].unit);
+  }
+
+  document.getElementById("verinfo").textContent =
+      gSources[cell.dataset.source].getPrettyVersion(gProductData[cell.dataset.product],
+                                                     cell.dataset.channel);
+
+  // Finally actually display the box.
+  info.style.display = "block";
+}
+
+function hideInfo(event) {
+  var cell = event.target;
+  var info = document.getElementById("infobox");
+  // Hide the box.
+  info.style.display = "none";
+
+  // Reset info where needed.
+  info.getElementsByClassName(cell.dataset.source)[0].classList.remove("current");
+  if (gSources[cell.dataset.source].lowLimits) {
+    info.getElementsByClassName("limits")[0].classList.remove("low");
+  }
+  else {
+    info.getElementsByClassName("limits")[0].classList.remove("high");
+  }
+}
+
 function fetchFile(aURL, aFormat, aCallback) {
   var XHR = new XMLHttpRequest();
   XHR.onreadystatechange = function() {
-    if (XHR.readyState == 4) {
+    if (XHR.readyState == 4) {/*
       gLog.appendChild(document.createElement("li"))
           .appendChild(document.createTextNode(aURL + " - " + XHR.status +
-                                               " " + XHR.statusText));
+                                               " " + XHR.statusText));*/
     }
     if (XHR.readyState == 4 && XHR.status == 200) {
       // so far so good
@@ -353,50 +442,9 @@ function fetchFile(aURL, aFormat, aCallback) {
 function valueCallback(aValue, aCBData) {
   aCBData.data[aCBData.type].current = aValue;
   if (aValue !== null) {
-    if (gSources[aCBData.type].unit == "kMG") {
-      var val = aValue;
-      var prec = gSources[aCBData.type].precision;
-      var unit = "";
-      if (aValue > 1e10) {
-        prec = (prec === null) ? 0 : prec;
-        val = (val / 1e9).toFixed(prec);
-        unit = "G";
-      }
-      else if (aValue > 1e9) {
-        prec = (prec === null) ? 1 : prec;
-        val = (val / 1e9).toFixed(prec);
-        unit = "G";
-      }
-      else if (aValue > 1e7) {
-        prec = (prec === null) ? 0 : prec;
-        val = (val / 1e6).toFixed(prec);
-        unit = "M";
-      }
-      else if (aValue > 1e6) {
-        prec = (prec === null) ? 1 : prec;
-        val = (val / 1e6).toFixed(prec);
-        unit = "M";
-      }
-      else if (aValue > 1e4) {
-        prec = (prec === null) ? 0 : prec;
-        val = (val / 1e3).toFixed(prec);
-        unit = "k";
-      }
-      else if (aValue > 1e3) {
-        prec = (prec === null) ? 1 : prec;
-        val = (val / 1e3).toFixed(prec);
-        unit = "k";
-      }
-      else if (prec !== null) {
-        val = val.toFixed(prec);
-      }
-      aCBData.cell.textContent = val + unit;
-    }
-    else {
-      aCBData.cell.textContent = aValue.toFixed(gSources[aCBData.type].precision);
-      if (gSources[aCBData.type].unit)
-        aCBData.cell.textContent += gSources[aCBData.type].unit;
-    }
+    aCBData.cell.textContent = formatValue(aValue,
+                                           gSources[aCBData.type].precision,
+                                           gSources[aCBData.type].unit);
     aCBData.cell.classList.add("num");
     if (((gSources[aCBData.type].lowLimits) &&
          (aValue < aCBData.data[aCBData.type].min)) ||
@@ -413,6 +461,55 @@ function valueCallback(aValue, aCBData) {
     aCBData.cell.textContent = "ERR";
     aCBData.cell.classList.add("fail");
   }
+}
+
+function formatValue(aValue, aPrecision, aUnit) {
+  var formatted;
+  if (aUnit == "kMG") {
+    var val = aValue;
+    var prec = aPrecision;
+    var unit = "";
+    if (aValue > 1e10) {
+      prec = (prec === null) ? 0 : prec;
+      val = (val / 1e9).toFixed(prec);
+      unit = "G";
+    }
+    else if (aValue > 1e9) {
+      prec = (prec === null) ? 1 : prec;
+      val = (val / 1e9).toFixed(prec);
+      unit = "G";
+    }
+    else if (aValue > 1e7) {
+      prec = (prec === null) ? 0 : prec;
+      val = (val / 1e6).toFixed(prec);
+      unit = "M";
+    }
+    else if (aValue > 1e6) {
+      prec = (prec === null) ? 1 : prec;
+      val = (val / 1e6).toFixed(prec);
+      unit = "M";
+    }
+    else if (aValue > 1e4) {
+      prec = (prec === null) ? 0 : prec;
+      val = (val / 1e3).toFixed(prec);
+      unit = "k";
+    }
+    else if (aValue > 1e3) {
+      prec = (prec === null) ? 1 : prec;
+      val = (val / 1e3).toFixed(prec);
+      unit = "k";
+    }
+    else if (prec !== null) {
+      val = val.toFixed(prec);
+    }
+    formatted = val + unit;
+  }
+  else {
+    formatted = aValue.toFixed(aPrecision);
+    if (aUnit)
+      formatted += aUnit;
+  }
+  return formatted;
 }
 
 function majVer(aVersion) {

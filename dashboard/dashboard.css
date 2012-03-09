@@ -23,6 +23,15 @@ h1 {
   text-align: center;
 }
 
+table {
+  border-collapse: collapse;
+  border-spacing: 0 0;
+}
+
+th, td {
+  padding: 1px 3px;
+}
+
 .num {
   font-size: small;
   text-align: center;
@@ -43,6 +52,37 @@ h1 {
 
 .fail {
   background-color: #CC33CC;
+}
+
+#infobox {
+  display: none;
+  position: absolute;
+  background-color: #FFFFFF;
+  opacity: 0.9;
+  border-radius: 5px;
+  border: 1px solid #404040;
+  padding: 0 1em;
+}
+
+.info {
+  display: none;
+}
+
+.info.current {
+  display: block;
+}
+
+/* temporary */
+.moredata {
+  display: none;
+}
+
+.limits.low > .high {
+  display: none;
+}
+
+.limits.high > .low {
+  display: none;
 }
 
 #debugLog {

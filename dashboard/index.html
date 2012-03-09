@@ -14,6 +14,21 @@
 <h1>Stability Dashboard</h1>
 <p id="dateLine">Analyzed date: <span id="repDay"></span></p>
 
+<div id="infobox">
+<p class="info adu">Active daily installations as counted by the AMO blocklist pings</p>
+<p class="info rate">Crash rate in total crashes per 100 ADUs</p>
+<p class="info sigcnt">Count of different signatures</p>
+<p class="info startup">Percentage of startup crashes (of total crashes)</p>
+<p class="info flashhang">Count of total hang reports that have a Flash version detected</p>
+<p class="info flashcrash">Percentage of non-hang reports that have a Flash version detected (compared to total non-hang reports)</p>
+<p class="version">Value for: <span id="verinfo"></span></p>
+<p class="moredata"><a href="" id="moredatalink">View detailed report</a></p>
+<p class="limits">
+  <span class="low">low</span><span class="high">high</span>: <span id="limit1"></span> -
+  <span class="low">min</span><span class="high">max</span>: <span id="limit2"></span>
+</p>
+</div>
+
 <div id="dashboard">
 <section id="none">
 <h2></h2>
