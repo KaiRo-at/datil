@@ -39,7 +39,7 @@ th, td {
 }
 
 .normal {
-  background-color: #33CC33;
+  background-color: #66CC66;
 }
 
 .outside {
@@ -47,11 +47,11 @@ th, td {
 }
 
 .faroff {
-  background-color: #CC3333;
+  background-color: #CC6666;
 }
 
 .fail {
-  background-color: #CC33CC;
+  background-color: #CC66CC;
 }
 
 #infobox {
