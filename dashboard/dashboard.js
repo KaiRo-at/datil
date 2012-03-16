@@ -10,7 +10,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "13.0a1",
+        version: "14.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
@@ -20,7 +20,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "12.0a2",
+        version: "13.0a2",
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
@@ -30,7 +30,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0b8",
+        version: "12.0b1",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -41,7 +41,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "10.0.2",
+        version: "11.0",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 10, high: 2, max: 2.5 },
@@ -60,7 +60,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "13.0a1",
+        version: "14.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 10, max: 15 },
@@ -68,7 +68,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "12.0a2",
+        version: "13.0a2",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 10, max: 15 },
@@ -76,7 +76,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0b6",
+        version: "12.0b1",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
@@ -102,7 +102,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "13.0a1",
+        version: "14.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 40, max: 60 },
@@ -110,7 +110,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "12.0a2",
+        version: "13.0a2",
         adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 40, max: 60 },
@@ -118,7 +118,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "11.0b2",
+        version: "12.0b1",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
