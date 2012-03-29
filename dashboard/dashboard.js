@@ -294,7 +294,7 @@ window.onload = function() {
   // Get date to analyze.
   var anadate = new Date();
   anadate.setDate(anadate.getDate() - 1); // yesterday
-  if (anadate.getUTCHours() < 14)
+  if (anadate.getUTCHours() < 13)
     anadate.setDate(anadate.getDate() - 1); // the day before
   // Format the date for ISO. Phew.
   gDay = anadate.getUTCFullYear() + "-";
