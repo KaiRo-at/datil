@@ -83,7 +83,7 @@ var gProductData = {
         sigcnt: { high: 60, max: 80 },
         startup: { high: 20, max: 25 },
       },
-      release: {
+      esr: {
         name: "Release",
         version: "10.0.3esr",
         appendver: true,
