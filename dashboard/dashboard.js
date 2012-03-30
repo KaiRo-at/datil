@@ -187,11 +187,13 @@ var gSources = {
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
       return aProd.full + " " +
-             (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel);
+             (aProd.channels[aChannel].appendver ?
+              majVer(aProd.channels[aChannel].version) : aChannel);
     },
     getSigCntFile: function(aProd, aChannel) {
       return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             (aProd.channels[aChannel].appendver ? majVer(aProd.channels[aChannel].version) : aChannel) +
+             (aProd.channels[aChannel].appendver ?
+              majVer(aProd.channels[aChannel].version) : aChannel) +
              "-sigcount.csv";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
@@ -211,7 +213,8 @@ var gSources = {
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
       if (aProd.channels[aChannel].appendver)
-        return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+        return aProd.full + " " + repVer(aProd.channels[aChannel].version) +
+               " " + aChannel;
       else
         return aProd.full + " " + aChannel;
     },
