@@ -44,7 +44,7 @@ var gProductData = {
         version: "11.0",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
-        rate: { factor: 10, high: 2, max: 2.5 },
+        rate: { factor: 1, high: 2, max: 2.5 },
         sigcnt: { high: 2e4, max: 2.5e4 },
         startup: { high: 15, max: 20 },
         flashhang: { high: 15000, max: 20000 },
