@@ -105,7 +105,7 @@ var gProductData = {
         version: "15.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 10 },
-        sigcnt: { high: 80, max: 150 },
+        sigcnt: { high: 100, max: 170 },
         startup: { high: 20, max: 30 },
       },
       aurora: {
@@ -113,7 +113,7 @@ var gProductData = {
         version: "14.0a2",
         adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 5 },
-        sigcnt: { high: 100, max: 150 },
+        sigcnt: { high: 150, max: 200 },
         startup: { high: 20, max: 30 },
       },
       beta: {
