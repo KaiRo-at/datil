@@ -30,7 +30,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "14.0b6",
+        version: "14.0b7",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -41,7 +41,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "13.0",
+        version: "13.0.1",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 1, high: 2, max: 2.5 },
@@ -76,7 +76,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "14.0b6",
+        version: "14.0b7",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 2.5 },
@@ -118,7 +118,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "14.0b6",
+        version: "14.0b7",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
