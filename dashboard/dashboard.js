@@ -10,7 +10,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "16.0a1",
+        version: "17.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
@@ -60,7 +60,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "16.0a1",
+        version: "17.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 10, max: 15 },
@@ -102,7 +102,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "16.0a1",
+        version: "17.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 10 },
         sigcnt: { high: 100, max: 250 },
