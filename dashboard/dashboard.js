@@ -20,7 +20,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "15.0a2",
+        version: "16.0a2",
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
@@ -30,7 +30,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "14.0b12",
+        version: "15.0b1",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -68,7 +68,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "15.0a2",
+        version: "16.0a2",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 10, max: 15 },
@@ -110,7 +110,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "15.0a2",
+        version: "16.0a2",
         adu: { low: 10000, min: 1000 },
         rate: { high: 2, max: 7 },
         sigcnt: { high: 150, max: 300 },
@@ -118,7 +118,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "14.0b12",
+        version: "15.0b1",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
