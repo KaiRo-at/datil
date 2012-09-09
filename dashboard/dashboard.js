@@ -30,7 +30,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "16.0b1",
+        version: "16.0b2",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -41,7 +41,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "15.0",
+        version: "15.0.1",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 1, high: 2, max: 2.5 },
@@ -118,7 +118,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "16.0b1",
+        version: "16.0b2",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
