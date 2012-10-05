@@ -15,8 +15,8 @@ var gProductData = {
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
         startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: 70, max: 90 }, // total Flash hangs
-        flashcrash: { high: 3, max: 5 }, // percentage of crashes that comes from Flash
+        flashhang: { high: .25, max: .3 }, // Flash hangs per 100 ADU
+        flashcrash: { high: .2, max: .25 }, // Flash crashes per 100 ADU
       },
       aurora: {
         name: "Aurora",
@@ -25,8 +25,8 @@ var gProductData = {
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: 300, max: 400 },
-        flashcrash: { high: 4, max: 7 },
+        flashhang: { high: .25, max: .3 },
+        flashcrash: { high: .2, max: .25 },
       },
       beta: {
         name: "Beta",
@@ -36,8 +36,8 @@ var gProductData = {
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 8e3, max: 1e4 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: 3000, max: 4000 },
-        flashcrash: { high: 5, max: 7 },
+        flashhang: { high: .25, max: .3 },
+        flashcrash: { high: .2, max: .25 },
       },
       release: {
         name: "Release",
@@ -47,8 +47,8 @@ var gProductData = {
         rate: { factor: 1, high: 2, max: 2.5 },
         sigcnt: { high: 2e4, max: 2.5e4 },
         startup: { high: 15, max: 20 },
-        flashhang: { high: 15000, max: 20000 },
-        flashcrash: { high: 10, max: 13 },
+        flashhang: { high: .25, max: .3 },
+        flashcrash: { high: .2, max: .25 },
       },
     },
   },
@@ -239,7 +239,8 @@ var gSources = {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].total_flash.hang, aCBData);
+              aCallback(aData[gDay].total_flash.hang / aData[gDay].adu * 100,
+                        aCBData);
           }
       );
     },
@@ -261,7 +262,7 @@ var gSources = {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].total_flash.crash / aData[gDay].total.crash * 100,
+              aCallback(aData[gDay].total_flash.crash / aData[gDay].adu * 100,
                         aCBData);
           }
       );
