@@ -223,7 +223,7 @@ var gSources = {
     },
   },
   flashhang: {
-    precision: 0,
+    precision: 2,
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
@@ -246,8 +246,8 @@ var gSources = {
     },
   },
   flashcrash: {
-    precision: 1,
-    unit: "%",
+    precision: 2,
+    unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
       return aProd.full + " " + repVer(aProd.channels[aChannel].version);
