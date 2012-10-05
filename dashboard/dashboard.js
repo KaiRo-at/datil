@@ -69,7 +69,7 @@ var gProductData = {
       aurora: {
         name: "Aurora",
         version: "17.0a2",
-        adu: { low: 10000, min: 1000 },
+        adu: { low: 1e4, min: 1e3 },
         rate: { high: 2, max: 7 },
         sigcnt: { high: 250, max: 400 },
         startup: { high: 20, max: 30 },
@@ -80,7 +80,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
-        sigcnt: { high: 2000, max: 3000 },
+        sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 15, max: 25 },
       },
       release: {
@@ -89,7 +89,7 @@ var gProductData = {
         appendver: true,
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 3 },
-        sigcnt: { high: 4000, max: 7000 },
+        sigcnt: { high: 7e3, max: 1e4 },
         startup: { high: 15, max: 20 },
       },
     },
