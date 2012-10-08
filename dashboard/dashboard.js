@@ -17,6 +17,7 @@ var gProductData = {
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: .25, max: .3 }, // Flash hangs per 100 ADU
         flashcrash: { high: .2, max: .25 }, // Flash crashes per 100 ADU
+        opentracking: { high: 5, max: 10 },
       },
       aurora: {
         name: "Aurora",
@@ -27,6 +28,7 @@ var gProductData = {
         startup: { high: 20, max: 30 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
+        opentracking: { high: 3, max: 10 },
       },
       beta: {
         name: "Beta",
@@ -38,6 +40,7 @@ var gProductData = {
         startup: { high: 20, max: 25 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
+        opentracking: { high: 1, max: 3 },
       },
       release: {
         name: "Release",
@@ -49,6 +52,7 @@ var gProductData = {
         startup: { high: 15, max: 20 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
+        opentracking: { high: 1, max: 1 },
       },
     },
   },
@@ -65,6 +69,7 @@ var gProductData = {
         rate: { high: 2, max: 10 },
         sigcnt: { high: 150, max: 250 },
         startup: { high: 20, max: 30 },
+        opentracking: { high: 5, max: 10 },
       },
       aurora: {
         name: "Aurora",
@@ -73,6 +78,7 @@ var gProductData = {
         rate: { high: 2, max: 7 },
         sigcnt: { high: 250, max: 400 },
         startup: { high: 20, max: 30 },
+        opentracking: { high: 3, max: 10 },
       },
       beta: {
         name: "Beta",
@@ -82,6 +88,7 @@ var gProductData = {
         rate: { high: 2, max: 5 },
         sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 15, max: 25 },
+        opentracking: { high: 1, max: 3 },
       },
       release: {
         name: "Release",
@@ -91,6 +98,7 @@ var gProductData = {
         rate: { high: 2, max: 3 },
         sigcnt: { high: 7e3, max: 1e4 },
         startup: { high: 15, max: 20 },
+        opentracking: { high: 1, max: 1 },
       },
     },
   },
@@ -108,6 +116,7 @@ var gProductData = {
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 400, max: 500 },
         startup: { high: 15, max: 20 },
+        opentracking: { high: 1, max: 1 },
       },
     },
   },
@@ -268,12 +277,41 @@ var gSources = {
       );
     },
   },
+  opentracking: {
+    precision: 0,
+    unit: "",
+    lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " + Core " + majVer(aProd.channels[aChannel].version);
+    },
+    getTrackersFile: function(aProd, aChannel) {
+      var mver = majVer(aProd.channels[aChannel].version);
+      var bugprod = aProd.full;
+      if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
+      return gBzAPIPath + "count?keywords=crash&keywords_type=anywords" +
+             "&product=Core&product=Toolkit&product=" + bugprod +
+             "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
+             "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
+             + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getTrackersFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData)
+              aCallback(null, aCBData);
+            else
+              aCallback(aData.data, aCBData);
+          }
+      );
+    },
+  },
 }
 
 var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
 var gAnalysisPath = "../../";
+var gBzAPIPath = "https://api-dev.bugzilla.mozilla.org/latest/";
 
 window.onload = function() {
   gDebug = document.getElementById("debug");
@@ -424,6 +462,8 @@ function fetchFile(aURL, aFormat, aCallback) {
     }
   };
   XHR.open("GET", aURL);
+  if (aFormat == "json") { XHR.setRequestHeader("Accept", "application/json"); }
+  else if (aFormat == "xml") { XHR.setRequestHeader("Accept", "application/xml"); }
   XHR.send();
 }
 
