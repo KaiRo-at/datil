@@ -284,25 +284,21 @@ var gSources = {
     getPrettyVersion: function(aProd, aChannel) {
       return aProd.full + " + Core " + majVer(aProd.channels[aChannel].version);
     },
-    getTrackersFile: function(aProd, aChannel) {
+    getBugzillaQuery: function(aProd, aChannel) {
       var mver = majVer(aProd.channels[aChannel].version);
       var bugprod = aProd.full;
       if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
-      return gBzAPIPath + "count?keywords=crash&keywords_type=anywords" +
+      return "?keywords=crash&keywords_type=anywords" +
              "&product=Core&product=Toolkit&product=" + bugprod +
              "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
              "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
              + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
     },
+    getTrackersFile: function(aProd, aChannel) {
+      return gBzAPIPath + "count" + this.getBugzillaQuery(aProd, aChannel);
+    },
     getLinkURL: function(aProd, aChannel) {
-      var mver = majVer(aProd.channels[aChannel].version);
-      var bugprod = aProd.full;
-      if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
-      return gBzBasePath + "buglist.cgi?keywords=crash&keywords_type=anywords" +
-             "&product=Core&product=Toolkit&product=" + bugprod +
-             "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
-             "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
-             + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
+      return gBzBasePath + "buglist.cgi" + this.getBugzillaQuery(aProd, aChannel);
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getTrackersFile(aProd, aChannel), "json",
