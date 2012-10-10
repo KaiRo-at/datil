@@ -115,6 +115,9 @@ var gSources = {
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-daily.json";
     },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
@@ -137,6 +140,9 @@ var gSources = {
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-daily.json";
+    },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
@@ -171,6 +177,9 @@ var gSources = {
               majVer(aProd.channels[aChannel].version) : aChannel) +
              "-sigcount.csv";
     },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getSigCntFile(aProd, aChannel), "",
           function(aSigCnt) {
@@ -200,6 +209,9 @@ var gSources = {
       else
         return gAnalysisPath + aProd.abbr + "-" + aChannel + ".startup.json";
     },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getStartupFile(aProd, aChannel), "json",
           function(aData) {
@@ -224,6 +236,9 @@ var gSources = {
       return gAnalysisPath + aProd.abbr + "-" +
              repVer(aProd.channels[aChannel].version) + ".flashhang.json";
     },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
           function(aData) {
@@ -246,6 +261,9 @@ var gSources = {
     getFlashHangFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.abbr + "-" +
              repVer(aProd.channels[aChannel].version) + ".flashhang.json";
+    },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
@@ -276,6 +294,16 @@ var gSources = {
              "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
              + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
     },
+    getLinkURL: function(aProd, aChannel) {
+      var mver = majVer(aProd.channels[aChannel].version);
+      var bugprod = aProd.full;
+      if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
+      return gBzBasePath + "buglist.cgi?keywords=crash&keywords_type=anywords" +
+             "&product=Core&product=Toolkit&product=" + bugprod +
+             "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
+             "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
+             + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
+    },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getTrackersFile(aProd, aChannel), "json",
           function(aData) {
@@ -294,6 +322,7 @@ var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
 var gAnalysisPath = "../../";
 var gBzAPIPath = "https://api-dev.bugzilla.mozilla.org/latest/";
+var gBzBasePath = "https://bugzilla.mozilla.org/";
 
 window.onload = function() {
   gDebug = document.getElementById("debug");
@@ -398,8 +427,9 @@ function showInfo(event) {
   }
 
   document.getElementById("verinfo").textContent =
-      gSources[cell.dataset.source].getPrettyVersion(gProductData[cell.dataset.product],
-                                                     cell.dataset.channel);
+      gSources[cell.dataset.source]
+      .getPrettyVersion(gProductData[cell.dataset.product],
+                                     cell.dataset.channel);
 
   // Finally actually display the box.
   info.style.display = "block";
@@ -452,9 +482,20 @@ function fetchFile(aURL, aFormat, aCallback) {
 function valueCallback(aValue, aCBData) {
   aCBData.data[aCBData.type].current = aValue;
   if (aValue !== null) {
-    aCBData.cell.textContent = formatValue(aValue,
-                                           gSources[aCBData.type].precision,
-                                           gSources[aCBData.type].unit);
+    var url = gSources[aCBData.type]
+              .getLinkURL(gProductData[aCBData.cell.dataset.product],
+                                       aCBData.cell.dataset.channel);
+    var value = formatValue(aValue, gSources[aCBData.type].precision,
+                                    gSources[aCBData.type].unit);
+    if (url) {
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.textContent = value;
+      aCBData.cell.appendChild(link);
+    }
+    else {
+      aCBData.cell.textContent = value;
+    }
     aCBData.cell.classList.add("num");
     if (((gSources[aCBData.type].lowLimits) &&
          (aValue < aCBData.data[aCBData.type].min)) ||

@@ -54,6 +54,11 @@ th, td {
   background-color: #CC80CC;
 }
 
+td > a {
+  display: block;
+  width: 99%;
+}
+
 #infobox {
   display: none;
   position: absolute;
