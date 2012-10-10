@@ -10,7 +10,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "18.0a1",
+        version: "19.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
@@ -64,7 +64,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "18.0a1",
+        version: "19.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 10 },
         sigcnt: { high: 150, max: 250 },
@@ -97,24 +97,6 @@ var gProductData = {
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 7e3, max: 1e4 },
-        startup: { high: 15, max: 20 },
-        opentracking: { high: 1, max: 1 },
-      },
-    },
-  },
-  fennec: {
-    name: "Mobile (XUL)",
-    full: "Fennec",
-    abbr: "fn",
-    noflash: true,
-    channels: {
-      esr: {
-        name: "Release",
-        version: "10.0.5esr",
-        appendver: true,
-        adu: { low: 5e5, min: 1e5 },
-        rate: { high: 2, max: 2.5 },
-        sigcnt: { high: 400, max: 500 },
         startup: { high: 15, max: 20 },
         opentracking: { high: 1, max: 1 },
       },
