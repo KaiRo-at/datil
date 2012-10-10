@@ -392,7 +392,7 @@ function infoEvent(event) {
   var info = document.getElementById("infobox");
 
   var cell = event.target;
-  if (cell.tagName.toLowerCase != "td") { cell = cell.parentNode; }
+  if (cell.tagName == "A") { cell = cell.parentNode; }
 
   if (info.getElementsByClassName(cell.dataset.source)[0]) {
     if (event.type == "mouseover") {
@@ -433,7 +433,7 @@ function infoEvent(event) {
       document.getElementById("verinfo").textContent =
           gSources[cell.dataset.source]
           .getPrettyVersion(gProductData[cell.dataset.product],
-                                        cell.dataset.channel);
+                                         cell.dataset.channel);
 
       // Finally actually display the box.
       info.style.display = "block";
