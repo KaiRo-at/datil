@@ -368,8 +368,8 @@ function processData() {
         }
         else {
           var sourceCell = sourcerow.appendChild(createCell(""));
-          sourceCell.addEventListener("mouseover", showInfo, false);
-          sourceCell.addEventListener("mouseout", hideInfo, false);
+          sourceCell.addEventListener("mouseover", infoEvent, false);
+          sourceCell.addEventListener("mouseout", infoEvent, false);
           sourceCell.dataset.product = product;
           sourceCell.dataset.channel = channel;
           sourceCell.dataset.source = source;
@@ -388,66 +388,69 @@ function createCell(aText, aHeader) {
   return cell;
 }
 
-function showInfo(event) {
-  var cell = event.target;
+function infoEvent(event) {
   var info = document.getElementById("infobox");
 
-  // Position: The parent is the table and has the offset within the body.
-  info.style.left = (cell.offsetParent.offsetLeft +
-                     cell.offsetLeft - 1) + "px";
-  info.style.top = (cell.offsetParent.offsetTop +
-                    cell.offsetTop + cell.offsetHeight - 1) + "px";
-
-  // Set info to show.
-  info.getElementsByClassName(cell.dataset.source)[0].classList.add("current");
-
-  var limits = gProductData[cell.dataset.product]
-               .channels[cell.dataset.channel][cell.dataset.source];
-  if (gSources[cell.dataset.source].lowLimits) {
-    info.getElementsByClassName("limits")[0].classList.add("low");
-    document.getElementById("limit1").textContent =
-        formatValue(limits.low,
-                    gSources[cell.dataset.source].precision,
-                    gSources[cell.dataset.source].unit);
-    document.getElementById("limit2").textContent =
-        formatValue(limits.min,
-                    gSources[cell.dataset.source].precision,
-                    gSources[cell.dataset.source].unit);
-  }
-  else {
-    info.getElementsByClassName("limits")[0].classList.add("high");
-    document.getElementById("limit1").textContent =
-        formatValue(limits.high,
-                    gSources[cell.dataset.source].precision,
-                    gSources[cell.dataset.source].unit);
-    document.getElementById("limit2").textContent =
-        formatValue(limits.max,
-                    gSources[cell.dataset.source].precision,
-                    gSources[cell.dataset.source].unit);
-  }
-
-  document.getElementById("verinfo").textContent =
-      gSources[cell.dataset.source]
-      .getPrettyVersion(gProductData[cell.dataset.product],
-                                     cell.dataset.channel);
-
-  // Finally actually display the box.
-  info.style.display = "block";
-}
-
-function hideInfo(event) {
   var cell = event.target;
-  var info = document.getElementById("infobox");
-  // Hide the box.
-  info.style.display = "none";
+  if (cell.tagName.toLowerCase != "td") { cell = cell.parentNode; }
 
-  // Reset info where needed.
-  info.getElementsByClassName(cell.dataset.source)[0].classList.remove("current");
-  if (gSources[cell.dataset.source].lowLimits) {
-    info.getElementsByClassName("limits")[0].classList.remove("low");
-  }
-  else {
-    info.getElementsByClassName("limits")[0].classList.remove("high");
+  if (info.getElementsByClassName(cell.dataset.source)[0]) {
+    if (event.type == "mouseover") {
+      // Position: The parent is the table and has the offset within the body.
+      info.style.left = (cell.offsetParent.offsetLeft +
+                        cell.offsetLeft - 1) + "px";
+      info.style.top = (cell.offsetParent.offsetTop +
+                        cell.offsetTop + cell.offsetHeight - 1) + "px";
+
+      // Set info to show.
+      info.getElementsByClassName(cell.dataset.source)[0].classList.add("current");
+
+      var limits = gProductData[cell.dataset.product]
+                  .channels[cell.dataset.channel][cell.dataset.source];
+      if (gSources[cell.dataset.source].lowLimits) {
+        info.getElementsByClassName("limits")[0].classList.add("low");
+        document.getElementById("limit1").textContent =
+            formatValue(limits.low,
+                        gSources[cell.dataset.source].precision,
+                        gSources[cell.dataset.source].unit);
+        document.getElementById("limit2").textContent =
+            formatValue(limits.min,
+                        gSources[cell.dataset.source].precision,
+                        gSources[cell.dataset.source].unit);
+      }
+      else {
+        info.getElementsByClassName("limits")[0].classList.add("high");
+        document.getElementById("limit1").textContent =
+            formatValue(limits.high,
+                        gSources[cell.dataset.source].precision,
+                        gSources[cell.dataset.source].unit);
+        document.getElementById("limit2").textContent =
+            formatValue(limits.max,
+                        gSources[cell.dataset.source].precision,
+                        gSources[cell.dataset.source].unit);
+      }
+
+      document.getElementById("verinfo").textContent =
+          gSources[cell.dataset.source]
+          .getPrettyVersion(gProductData[cell.dataset.product],
+                                        cell.dataset.channel);
+
+      // Finally actually display the box.
+      info.style.display = "block";
+    }
+    else {
+      // Hide the box.
+      info.style.display = "none";
+
+      // Reset info where needed.
+      info.getElementsByClassName(cell.dataset.source)[0].classList.remove("current");
+      if (gSources[cell.dataset.source].lowLimits) {
+        info.getElementsByClassName("limits")[0].classList.remove("low");
+      }
+      else {
+        info.getElementsByClassName("limits")[0].classList.remove("high");
+      }
+    }
   }
 }
 
@@ -476,7 +479,12 @@ function fetchFile(aURL, aFormat, aCallback) {
   XHR.open("GET", aURL);
   if (aFormat == "json") { XHR.setRequestHeader("Accept", "application/json"); }
   else if (aFormat == "xml") { XHR.setRequestHeader("Accept", "application/xml"); }
-  XHR.send();
+  try {
+    XHR.send();
+  }
+  catch (e) {
+    aCallback(null);
+  }
 }
 
 function valueCallback(aValue, aCBData) {
