@@ -33,7 +33,7 @@ th, td {
 }
 
 .defaulthide {
-  visibility: hidden;
+  display: none;
 }
 
 .num {
