@@ -15,8 +15,8 @@ var gProductData = {
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
         startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: .25, max: .3 }, // Flash hangs per 100 ADU
-        flashcrash: { high: .2, max: .25 }, // Flash crashes per 100 ADU
+        flashhang: { high: .1, max: .3 }, // Flash hangs per 100 ADU
+        flashcrash: { high: .1, max: .2 }, // Flash crashes per 100 ADU
         opentracking: { high: 10, max: 20 },
       },
       aurora: {
@@ -26,8 +26,8 @@ var gProductData = {
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 20, max: 30 },
-        flashhang: { high: .25, max: .3 },
-        flashcrash: { high: .2, max: .25 },
+        flashhang: { high: .1, max: .3 },
+        flashcrash: { high: .1, max: .2 },
         opentracking: { high: 10, max: 30 },
       },
       beta: {
@@ -38,8 +38,8 @@ var gProductData = {
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 8e3, max: 1e4 },
         startup: { high: 20, max: 25 },
-        flashhang: { high: .25, max: .3 },
-        flashcrash: { high: .2, max: .25 },
+        flashhang: { high: .1, max: .3 },
+        flashcrash: { high: .1, max: .2 },
         opentracking: { high: 5, max: 20 },
       },
       release: {
@@ -50,8 +50,8 @@ var gProductData = {
         rate: { factor: 1, high: 2, max: 2.5 },
         sigcnt: { high: 2e4, max: 2.5e4 },
         startup: { high: 15, max: 20 },
-        flashhang: { high: .25, max: .3 },
-        flashcrash: { high: .2, max: .25 },
+        flashhang: { high: .1, max: .3 },
+        flashcrash: { high: .1, max: .2 },
         opentracking: { high: 2, max: 5 },
       },
     },
