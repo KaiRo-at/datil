@@ -17,7 +17,7 @@ var gProductData = {
         startup: { high: 20, max: 30 }, // percent of total crashes
         flashhang: { high: .25, max: .3 }, // Flash hangs per 100 ADU
         flashcrash: { high: .2, max: .25 }, // Flash crashes per 100 ADU
-        opentracking: { high: 5, max: 10 },
+        opentracking: { high: 10, max: 20 },
       },
       aurora: {
         name: "Aurora",
@@ -28,7 +28,7 @@ var gProductData = {
         startup: { high: 20, max: 30 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
-        opentracking: { high: 3, max: 10 },
+        opentracking: { high: 10, max: 30 },
       },
       beta: {
         name: "Beta",
@@ -40,7 +40,7 @@ var gProductData = {
         startup: { high: 20, max: 25 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
-        opentracking: { high: 1, max: 3 },
+        opentracking: { high: 5, max: 20 },
       },
       release: {
         name: "Release",
@@ -52,7 +52,7 @@ var gProductData = {
         startup: { high: 15, max: 20 },
         flashhang: { high: .25, max: .3 },
         flashcrash: { high: .2, max: .25 },
-        opentracking: { high: 1, max: 1 },
+        opentracking: { high: 2, max: 5 },
       },
     },
   },
@@ -69,7 +69,7 @@ var gProductData = {
         rate: { high: 2, max: 10 },
         sigcnt: { high: 150, max: 250 },
         startup: { high: 20, max: 30 },
-        opentracking: { high: 5, max: 10 },
+        opentracking: { high: 10, max: 20 },
       },
       aurora: {
         name: "Aurora",
@@ -78,7 +78,7 @@ var gProductData = {
         rate: { high: 2, max: 7 },
         sigcnt: { high: 250, max: 400 },
         startup: { high: 20, max: 30 },
-        opentracking: { high: 3, max: 10 },
+        opentracking: { high: 10, max: 30 },
       },
       beta: {
         name: "Beta",
@@ -88,7 +88,7 @@ var gProductData = {
         rate: { high: 2, max: 5 },
         sigcnt: { high: 2e3, max: 3e3 },
         startup: { high: 15, max: 25 },
-        opentracking: { high: 1, max: 3 },
+        opentracking: { high: 5, max: 20 },
       },
       release: {
         name: "Release",
@@ -98,7 +98,7 @@ var gProductData = {
         rate: { high: 2, max: 3 },
         sigcnt: { high: 7e3, max: 1e4 },
         startup: { high: 15, max: 20 },
-        opentracking: { high: 1, max: 1 },
+        opentracking: { high: 2, max: 5 },
       },
     },
   },
