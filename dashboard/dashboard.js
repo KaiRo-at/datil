@@ -156,7 +156,7 @@ var gSources = {
               var adu = parseInt(aData[aProd.channels[aChannel].version][gDay].adu);
               var factor = aProd.channels[aChannel].rate.factor ?
                            aProd.channels[aChannel].rate.factor : 1;
-              aCallback((adu ? crashes / adu : 0) * 100 * factor, aCBData);
+              aCallback(adu ? (crashes / adu) * 100 * factor : null, aCBData);
             }
           }
       );
@@ -218,9 +218,10 @@ var gSources = {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].startup.browser ?
+              aCallback((aData[gDay].startup.browser && aData[gDay].total) ?
                         aData[gDay].startup.browser / aData[gDay].total * 100 :
-                        0, aCBData);
+                        0,
+                        aCBData);
           }
       );
     },
@@ -245,7 +246,9 @@ var gSources = {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].total_flash.hang / aData[gDay].adu * 100,
+              aCallback(aData[gDay].adu ?
+                        aData[gDay].total_flash.hang / aData[gDay].adu * 100 :
+                        null,
                         aCBData);
           }
       );
@@ -271,7 +274,9 @@ var gSources = {
             if (!aData || !aData[gDay])
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].total_flash.crash / aData[gDay].adu * 100,
+              aCallback(aData[gDay].adu ?
+                        aData[gDay].total_flash.crash / aData[gDay].adu * 100 :
+                        null,
                         aCBData);
           }
       );
