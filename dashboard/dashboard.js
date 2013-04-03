@@ -10,7 +10,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "22.0a1",
+        version: "23.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
@@ -21,7 +21,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "21.0a2",
+        version: "22.0a2",
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
@@ -32,7 +32,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "20.0b7",
+        version: "21.0b1",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -44,7 +44,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "19.0.2",
+        version: "20.0",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 1, high: 2, max: 2.5 },
@@ -64,7 +64,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "22.0a1",
+        version: "23.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 10 },
         sigcnt: { high: 150, max: 250 },
@@ -73,7 +73,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "21.0a2",
+        version: "22.0a2",
         adu: { low: 1e4, min: 1e3 },
         rate: { high: 2, max: 7 },
         sigcnt: { high: 250, max: 400 },
@@ -82,7 +82,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "20.0b7",
+        version: "21.0b1",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
@@ -92,7 +92,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "19.0.2",
+        version: "20.0",
         appendver: true,
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 3 },
