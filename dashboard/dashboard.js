@@ -87,7 +87,7 @@ var gProductData = {
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
         sigcnt: { high: 2e3, max: 3e3 },
-        startup: { high: 15, max: 25 },
+        startup: { high: 20, max: 30 },
         opentracking: { high: 5, max: 20 },
       },
       release: {
@@ -97,7 +97,7 @@ var gProductData = {
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 7e3, max: 1e4 },
-        startup: { high: 15, max: 20 },
+        startup: { high: 20, max: 30 },
         opentracking: { high: 2, max: 5 },
       },
     },
