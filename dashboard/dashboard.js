@@ -332,7 +332,7 @@ window.onload = function() {
   // Get date to analyze.
   fetchFile(gAnalysisPath + "latestdate.txt", "",
     function(aData) {
-      if (!aData) {
+      if (aData) {
         gDay = aData;
         document.getElementById("repDay").textContent = gDay;
         processData();
