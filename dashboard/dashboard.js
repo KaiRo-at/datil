@@ -330,21 +330,19 @@ window.onload = function() {
   gLog = document.getElementById("debugLog");
 
   // Get date to analyze.
-  var anadate = new Date();
-  anadate.setDate(anadate.getDate() - 1); // yesterday
-  if (anadate.getUTCHours() < 13)
-    anadate.setDate(anadate.getDate() - 1); // the day before
-  // Format the date for ISO. Phew.
-  gDay = anadate.getUTCFullYear() + "-";
-  if (anadate.getUTCMonth() < 9)
-    gDay += "0";
-  gDay += (anadate.getUTCMonth() + 1) + "-";
-  if (anadate.getUTCDate() < 10)
-    gDay += "0";
-  gDay += anadate.getUTCDate();
-  document.getElementById("repDay").textContent = gDay;
-
-  processData();
+  fetchFile(gAnalysisPath + "latestdate.txt", "json",
+    function(aData) {
+      if (!aData) {
+        gDay = aData;
+        document.getElementById("repDay").textContent = gDay;
+        processData();
+      }
+      else {
+        gDay = null;
+        document.getElementById("repDay").textContent = "ERROR - couldn't find latest analyzed date!"
+      }
+    }
+  );
 }
 
 function processData() {
