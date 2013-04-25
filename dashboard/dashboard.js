@@ -330,7 +330,7 @@ window.onload = function() {
   gLog = document.getElementById("debugLog");
 
   // Get date to analyze.
-  fetchFile(gAnalysisPath + "latestdate.txt", "json",
+  fetchFile(gAnalysisPath + "latestdate.txt", "",
     function(aData) {
       if (!aData) {
         gDay = aData;
