@@ -369,6 +369,8 @@ function processData() {
           var sourceCell = sourcerow.appendChild(createCell(""));
           sourceCell.addEventListener("mouseover", infoEvent, false);
           sourceCell.addEventListener("mouseout", infoEvent, false);
+          sourceCell.addEventListener("touchstart", infoEvent, false);
+          sourceCell.addEventListener("touchleave", infoEvent, false);
           sourceCell.dataset.product = product;
           sourceCell.dataset.channel = channel;
           sourceCell.dataset.source = source;
@@ -394,7 +396,7 @@ function infoEvent(event) {
   if (cell.tagName == "A") { cell = cell.parentNode; }
 
   if (info.getElementsByClassName(cell.dataset.source)[0]) {
-    if (event.type == "mouseover") {
+    if (event.type == "mouseover" || event.type == "touchstart") {
       // Position: The parent is the table and has the offset within the body.
       info.style.left = (cell.offsetParent.offsetLeft +
                         cell.offsetLeft - 1) + "px";

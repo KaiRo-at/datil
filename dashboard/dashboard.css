@@ -4,6 +4,8 @@
 
 body {
   font-family: sans-serif;
+  background-color: #FFFFFF;
+  color: #000000;
 }
 
 h1 {
@@ -12,6 +14,11 @@ h1 {
 
 #dateLine {
   margin-top: 0;
+}
+
+.help {
+  color: #808080;
+  font-style: italic;
 }
 
 #none, .hidden {
