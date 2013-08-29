@@ -19,6 +19,7 @@ h1 {
 .help {
   color: #808080;
   font-style: italic;
+  font-size: 75%;
 }
 
 #none, .hidden {
