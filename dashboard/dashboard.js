@@ -10,7 +10,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "27.0a1",
+        version: "28.0a1",
         adu: { low: 1e5, min: 7e4 }, // ADUs
         rate: { high: 2, max: 3 }, // crashes per 100 ADU
         sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
@@ -21,7 +21,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "26.0a2",
+        version: "27.0a2",
         adu: { low: 1e6, min: 1.25e5 },
         rate: { high: 2, max: 2.5 },
         sigcnt: { high: 2e3, max: 3e3 },
@@ -32,7 +32,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "25.0b",
+        version: "26.0b",
         appendver: true,
         adu: { low: 1e7, min: 1e6 },
         rate: { high: 2, max: 2.5 },
@@ -44,7 +44,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "24.0",
+        version: "25.0",
         appendver: true,
         adu: { low: 1e8, min: 1e7 },
         rate: { factor: 1, high: 2, max: 2.5 },
@@ -64,7 +64,7 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "27.0a1",
+        version: "28.0a1",
         adu: { low: 1000, min: 100 },
         rate: { high: 2, max: 10 },
         sigcnt: { high: 150, max: 250 },
@@ -73,7 +73,7 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "26.0a2",
+        version: "27.0a2",
         adu: { low: 1e4, min: 1e3 },
         rate: { high: 2, max: 7 },
         sigcnt: { high: 250, max: 400 },
@@ -82,7 +82,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "25.0b10",
+        version: "26.0b1",
         appendver: true,
         adu: { low: 1e5, min: 1e4 },
         rate: { high: 2, max: 5 },
@@ -92,13 +92,38 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "24.0",
+        version: "25.0",
         appendver: true,
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 3 },
         sigcnt: { high: 7e3, max: 1e4 },
         startup: { high: 20, max: 30 },
         opentracking: { high: 2, max: 5 },
+      },
+    },
+  },
+  metrofirefox: {
+    name: "Metro Firefox",
+    full: "MetroFirefox",
+    abbr: "ffm",
+    channels: {
+      nightly: {
+        name: "Nightly",
+        version: "28.0a1",
+        adu: { low: 300, min: 100 }, // ADUs
+        rate: { high: 2, max: 5 }, // crashes per 100 ADU
+        sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
+        startup: { high: 20, max: 30 }, // percent of total crashes
+        opentracking: { high: 10, max: 20 },
+      },
+      aurora: {
+        name: "Aurora",
+        version: "27.0a2",
+        adu: { low: 300, min: 100 },
+        rate: { high: 2, max: 3 },
+        sigcnt: { high: 2e3, max: 3e3 },
+        startup: { high: 20, max: 30 },
+        opentracking: { high: 10, max: 30 },
       },
     },
   },
@@ -293,6 +318,7 @@ var gSources = {
       var mver = majVer(aProd.channels[aChannel].version);
       var bugprod = aProd.full;
       if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
+      if (bugprod == "MetroFirefox") { bugprod = "Firefox%20for%20Metro"; }
       return "?keywords=crash&keywords_type=anywords" +
              "&product=Core&product=Toolkit&product=" + bugprod +
              "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
