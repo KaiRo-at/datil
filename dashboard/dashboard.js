@@ -105,7 +105,7 @@ var gProductData = {
   metrofirefox: {
     name: "Metro Firefox",
     full: "MetroFirefox",
-    abbr: "ffm",
+    abbr: "metrofirefox",
     noflash: true,
     channels: {
       nightly: {
