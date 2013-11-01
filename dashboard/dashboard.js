@@ -57,7 +57,7 @@ var gProductData = {
     },
   },
   fennecandroid: {
-    name: "Fennec Android (native)",
+    name: "Firefox for Android",
     full: "FennecAndroid",
     abbr: "fna",
     noflash: true,
@@ -103,7 +103,7 @@ var gProductData = {
     },
   },
   metrofirefox: {
-    name: "Metro Firefox",
+    name: "Firefox for Metro",
     full: "MetroFirefox",
     abbr: "metrofirefox",
     noflash: true,
