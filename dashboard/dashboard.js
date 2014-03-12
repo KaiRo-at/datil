@@ -536,6 +536,7 @@ function valueCallback(aValue, aCBData) {
     if (url) {
       var link = document.createElement("a");
       link.setAttribute("href", url);
+      link.setAttribute("target", "_blank");
       link.textContent = value;
       aCBData.cell.appendChild(link);
     }
