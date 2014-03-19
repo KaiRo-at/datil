@@ -35,7 +35,7 @@ window.onload = function() {
           axes: {
             x: {
               axisLabelFormatter: function(date) {
-                return date.getUTCFullYear() + "/" + (date.getUTCMonth() < 9 ? "0" : "") + (date.getUTCMonth() + 1 );
+                return date.getFullYear() + "/" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1 );
               },
             },
             y: {
