@@ -35,7 +35,7 @@ window.onload = function() {
           axes: {
             x: {
               axisLabelFormatter: function(date) {
-                return date.getFullYear() + "/" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1 );
+                return (date.getMonth() + 1) + "/" + date.getFullYear();
               },
             },
             y: {
@@ -45,6 +45,7 @@ window.onload = function() {
             },
           },
           colors: ["#004080", "#FF8000", "#FFCC00"],
+          strokeWidth: 2,
           legend: 'always',
           labels: ["date", "browser crashes", "plugin crashes", "plugin hangs"],
           labelsSeparateLines: true,
