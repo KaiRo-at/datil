@@ -16,13 +16,43 @@ var gBranches = {
     datafile: "Firefox-release-bytype.json",
     plugins: true,
     sumContent: true,
+    maxRate: 3,
+  },
+  fxbeta: {
+    title: "Firefox beta channel",
+    datafile: "Firefox-beta-bytype.json",
+    plugins: true,
+    sumContent: true,
+    maxRate: 3,
+  },
+  andrel: {
+    title: "Firefox for Android release channel",
+    datafile: "FennecAndroid-release-bytype.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 4,
+  },
+  andbeta: {
+    title: "Firefox for Android beta channel",
+    datafile: "FennecAndroid-beta-bytype.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 11,
   },
 }
 
 window.onload = function() {
   // Get data to graph.
   gBody = document.getElementsByTagName("body")[0];
-  gSelID = "fxrel";
+  if (location.hash) {
+    var urlAnchor = location.hash.substr(1); // Cut off the # sign.
+    if (urlAnchor in gBranches) {
+      gSelID = urlAnchor;
+    }
+  }
+  else {
+    gSelID = "fxrel";
+  }
 
   fetchFile(gDataPath + gBranches[gSelID].datafile, "json",
     function(aData) {
@@ -64,7 +94,7 @@ window.onload = function() {
         var graphOptions = {
           title: gBranches[gSelID].title,
           ylabel: "crashes / 100 ADI",
-          valueRange: [0, 3.01],
+          valueRange: [0, gBranches[gSelID].maxRate + .01],
           axes: {
             x: {
               axisLabelFormatter: function(aDate) {
