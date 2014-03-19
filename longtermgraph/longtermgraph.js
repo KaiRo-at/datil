@@ -4,50 +4,83 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph;
+var gBody, gGraph, gSelID;
+
+var gDataPath = "../../";
+// for local debugging
+//gDataPath = "../socorro/";
+
+var gBranches = {
+  fxrel: {
+    title: "Firefox release channel",
+    datafile: "Firefox-release-bytype.json",
+    plugins: true,
+    sumContent: true,
+  },
+}
 
 window.onload = function() {
   // Get data to graph.
   gBody = document.getElementsByTagName("body")[0];
-  var dataFile = "../../Firefox-release-bytype.json";
-  // for local debugging
-  //var dataFile = "../socorro/Firefox-release-bytype.json";
+  gSelID = "fxrel";
 
-  fetchFile(dataFile, "json",
+  fetchFile(gDataPath + gBranches[gSelID].datafile, "json",
     function(aData) {
       graphDiv = document.getElementById("graphdiv");
       if (aData) {
-        var graphData = [];
+        var graphData = [], dataArray, browserCrashes;
         // add elements in the following format: [ new Date("2009/07/12"), 100, 200 ]
         for (var day in aData) {
-          graphData.push([
-            new Date(day),
-            100 * aData[day].crashes["Browser"] / aData[day].adi,
-            100 * aData[day].crashes["OOP Plugin"] / aData[day].adi,
-            100 * aData[day].crashes["Hang Plugin"] / aData[day].adi,
-          ]);
+          dataArray = [ new Date(day) ];
+          if (gBranches[gSelID].sumContent) {
+            browserCrashes = 0;
+            if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
+            if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
+            dataArray.push(100 * browserCrashes / aData[day].adi);
+          }
+          else {
+            dataArray.push(100 * aData[day].crashes["Browser"] / aData[day].adi);
+          }
+          if (gBranches[gSelID].plugins) {
+            dataArray.push(100 * aData[day].crashes["OOP Plugin"] / aData[day].adi);
+            dataArray.push(100 * aData[day].crashes["Hang Plugin"] / aData[day].adi);
+          }
+          graphData.push(dataArray);
         }
 
+        var colors = ["#004080"], labels = ["date"];
+        if (gBranches[gSelID].sumContent) {
+          labels.push("browser+content crashes");
+        }
+        else {
+          labels.push("browser crashes");
+        }
+        if (gBranches[gSelID].plugins) {
+          labels.push("plugin crashes");
+          labels.push("plugin hangs");
+          colors.push("#FF8000");
+          colors.push("#FFCC00");
+        }
         var graphOptions = {
-          title: "Firefox release channel",
+          title: gBranches[gSelID].title,
           ylabel: "crashes / 100 ADI",
           valueRange: [0, 3.01],
           axes: {
             x: {
-              axisLabelFormatter: function(date) {
-                return (date.getMonth() + 1) + "/" + date.getFullYear();
+              axisLabelFormatter: function(aDate) {
+                return (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
               },
             },
             y: {
-              axisLabelFormatter: function(number) {
-                return number.toFixed(1);
+              axisLabelFormatter: function(aNumber) {
+                return aNumber.toFixed(1);
               },
             },
           },
-          colors: ["#004080", "#FF8000", "#FFCC00"],
+          colors: colors,
           strokeWidth: 2,
           legend: 'always',
-          labels: ["date", "browser crashes", "plugin crashes", "plugin hangs"],
+          labels: labels,
           labelsSeparateLines: true,
           width: gBody.clientWidth,
           height: gBody.clientHeight - graphDiv.offsetTop,
