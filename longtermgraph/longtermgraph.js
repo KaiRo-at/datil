@@ -4,7 +4,7 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph, gSelID;
+var gBody, gGraph, gSelID, gBranchSelect;
 
 var gDataPath = "../../";
 // for local debugging
@@ -44,10 +44,22 @@ var gBranches = {
 window.onload = function() {
   // Get data to graph.
   gBody = document.getElementsByTagName("body")[0];
-  if (location.hash) {
-    var urlAnchor = location.hash.substr(1); // Cut off the # sign.
+  gBranchSelect = document.getElementById("branch");
+  gBranchSelect.onchange = function() {
+    location.href = '?' + gBranchSelect.value;
+  }
+  var option;
+  for (var branchID in gBranches) {
+    option = document.createElement("option");
+    option.value = branchID;
+    option.text = gBranches[branchID].title;
+    gBranchSelect.add(option);
+  }
+  if (location.search) {
+    var urlAnchor = location.search.substr(1); // Cut off the ? sign.
     if (urlAnchor in gBranches) {
       gSelID = urlAnchor;
+      gBranchSelect.value = urlAnchor;
     }
   }
   else {
@@ -100,10 +112,20 @@ window.onload = function() {
               axisLabelFormatter: function(aDate) {
                 return (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
               },
+              valueFormatter: function(aMilliseconds) {
+                var dateValue = new Date(aMilliseconds);
+                return dateValue.getFullYear() + "-" +
+                  (dateValue.getMonth() < 9 ? "0" : "") + (dateValue.getMonth() + 1 ) + "-" +
+                  (dateValue.getDate() < 10 ? "0" : "") + dateValue.getDate();
+              },
+
             },
             y: {
               axisLabelFormatter: function(aNumber) {
                 return aNumber.toFixed(1);
+              },
+              valueFormatter: function(aNumber) {
+                return aNumber.toFixed(2);
               },
             },
           },
@@ -112,6 +134,7 @@ window.onload = function() {
           legend: 'always',
           labels: labels,
           labelsSeparateLines: true,
+          labelsShowZeroValues: true,
           width: gBody.clientWidth,
           height: gBody.clientHeight - graphDiv.offsetTop,
         };
