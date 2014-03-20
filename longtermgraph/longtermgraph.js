@@ -4,7 +4,7 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph, gSelID, gBranchSelect;
+var gBody, gGraph, gSelID, gBranchSelect, gDataIssueDays;
 
 var gDataPath = "../../";
 // for local debugging
@@ -14,6 +14,7 @@ var gBranches = {
   fxrel: {
     title: "Firefox release channel",
     datafile: "Firefox-release-bytype.json",
+    annotationfile: "Firefox-release-annotations.json",
     plugins: true,
     sumContent: true,
     maxRate: 3,
@@ -21,6 +22,7 @@ var gBranches = {
   fxbeta: {
     title: "Firefox beta channel",
     datafile: "Firefox-beta-bytype.json",
+    annotationfile: "Firefox-beta-annotations.json",
     plugins: true,
     sumContent: true,
     maxRate: 3,
@@ -28,6 +30,7 @@ var gBranches = {
   andrel: {
     title: "Firefox for Android release channel",
     datafile: "FennecAndroid-release-bytype.json",
+    annotationfile: "FennecAndroid-release-annotations.json",
     plugins: false,
     sumContent: false,
     maxRate: 4,
@@ -35,6 +38,7 @@ var gBranches = {
   andbeta: {
     title: "Firefox for Android beta channel",
     datafile: "FennecAndroid-beta-bytype.json",
+    annotationfile: "FennecAndroid-beta-annotations.json",
     plugins: false,
     sumContent: false,
     maxRate: 11,
@@ -65,13 +69,23 @@ window.onload = function() {
   else {
     gSelID = "fxrel";
   }
+  fetchFile(gDataPath + "dataissue-days.json", "json",
+    function(aData) {
+      if (aData) {
+        gDataIssueDays = aData;
+      }
+      else {
+        console.log("Error loading data issue days.");
+      }
+    }
+  );
 
   fetchFile(gDataPath + gBranches[gSelID].datafile, "json",
     function(aData) {
       graphDiv = document.getElementById("graphdiv");
       if (aData) {
         var graphData = [], dataArray, browserCrashes;
-        // add elements in the following format: [ new Date("2009/07/12"), 100, 200 ]
+        // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
         for (var day in aData) {
           dataArray = [ new Date(day) ];
           if (gBranches[gSelID].sumContent) {
@@ -140,6 +154,35 @@ window.onload = function() {
         };
 
         gGraph = new Dygraph(graphDiv, graphData, graphOptions);
+        gGraph.ready(function() {
+          fetchFile(gDataPath + gBranches[gSelID].annotationfile, "json",
+            function(aData) {
+              if (aData) {
+                // Convert dates to Date objects so they can be displayed.
+                for (var i = 0; i < aData.length; i++) {
+                  aData[i]["x"] = Date.parse(aData[i]["x"]);
+                }
+                if (gDataIssueDays) {
+                  for (var i = 0; i < gDataIssueDays.length; i++) {
+                    aData.push({
+                      series: labels[labels.length - 1],
+                      x: Date.parse(gDataIssueDays[i]),
+                      shortText: "D",
+                      text: "Data Issue (missing ADI or crashes)",
+                      attachAtBottom: true,
+                      cssClass: "dataissue",
+                    });
+                  }
+                }
+                gGraph.setAnnotations(aData);
+              }
+              else {
+                console.log("Error loading annotation data.");
+              }
+            }
+          );
+          console.log("foo");
+        });
       }
       else {
         // ERROR! We're screwed!

@@ -17,10 +17,15 @@ body {
   color: #000000;
 }
 
-#branch {
+#selectorplus {
   position: absolute;
   top: .5em;
   right: .5em;
+  text-align: right;
+}
+
+#selectorplus > a {
+  font-size: .75em;
 }
 
 h1 {
@@ -29,4 +34,15 @@ h1 {
 }
 
 #graphdiv {
+}
+
+.dygraphDefaultAnnotation {
+  opacity: 0.5;
+}
+
+.dataissue {
+  opacity: 0.3;
+  color: #404040 !important;
+  border-color: #404040 !important;
+  background-color: #CCCCCC !important;
 }
