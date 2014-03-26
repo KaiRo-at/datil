@@ -92,7 +92,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "28.0",
+        version: "28.0.1",
         appendver: true,
         adu: { low: 1e6, min: 1e5 },
         rate: { high: 2, max: 2.5 },
