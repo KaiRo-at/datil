@@ -15,8 +15,12 @@
 </head>
 <body>
 <div id="selectorplus">
-<select id="branch"></select><br>
-<a href="http://home.kairo.at/blog/2014-04/how_effective_is_the_stability_program">How to read the graph</a>
+<select id="branch"></select>
+<p id="selectorsubline">
+<input type="checkbox" id="adiCheckbox" checked onchange="swapADI(this);">
+<label for="adiCheckbox">Normalize by ADI</label>
+| <a href="http://home.kairo.at/blog/2014-04/how_effective_is_the_stability_program">How to read the graph</a>
+</p>
 </div>
 <h1>Crash Rate History</h1>
 <div id="graphdiv"></div>

@@ -24,8 +24,9 @@ body {
   text-align: right;
 }
 
-#selectorplus > a {
+#selectorsubline {
   font-size: .75em;
+  margin: 0;
 }
 
 h1 {

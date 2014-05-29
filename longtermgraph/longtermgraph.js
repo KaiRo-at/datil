@@ -4,7 +4,8 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph, gSelID, gBranchSelect, gDataIssueDays;
+var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox, gDataIssueDays,
+    gRawData, gUseADI = true;
 
 var gDataPath = "../../";
 // for local debugging
@@ -18,6 +19,7 @@ var gBranches = {
     plugins: true,
     sumContent: true,
     maxRate: 3,
+    maxCrashes: 2.2e6,
   },
   fxbeta: {
     title: "Firefox beta channel",
@@ -26,6 +28,7 @@ var gBranches = {
     plugins: true,
     sumContent: true,
     maxRate: 3,
+    maxCrashes: 80e3,
   },
   andrel: {
     title: "Firefox for Android release channel",
@@ -34,6 +37,7 @@ var gBranches = {
     plugins: false,
     sumContent: false,
     maxRate: 4,
+    maxCrashes: 100e3,
   },
   andbeta: {
     title: "Firefox for Android beta channel",
@@ -42,6 +46,7 @@ var gBranches = {
     plugins: false,
     sumContent: false,
     maxRate: 11,
+    maxCrashes: 10e3,
   },
 }
 
@@ -59,6 +64,13 @@ window.onload = function() {
     option.text = gBranches[branchID].title;
     gBranchSelect.add(option);
   }
+  gADICheckbox = document.getElementById("adiCheckbox");
+  gADICheckbox.checked = gUseADI;
+  gADICheckbox.onchange = function(aCheckbox) {
+    gUseADI = gADICheckbox.checked;
+    graphData(gRawData);
+  }
+
   if (location.search) {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
     if (urlAnchor in gBranches) {
@@ -80,116 +92,7 @@ window.onload = function() {
     }
   );
 
-  fetchFile(gDataPath + gBranches[gSelID].datafile, "json",
-    function(aData) {
-      graphDiv = document.getElementById("graphdiv");
-      if (aData) {
-        var graphData = [], dataArray, browserCrashes;
-        // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
-        for (var day in aData) {
-          dataArray = [ new Date(day) ];
-          if (gBranches[gSelID].sumContent) {
-            browserCrashes = 0;
-            if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
-            if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
-            dataArray.push(100 * browserCrashes / aData[day].adi);
-          }
-          else {
-            dataArray.push(100 * aData[day].crashes["Browser"] / aData[day].adi);
-          }
-          if (gBranches[gSelID].plugins) {
-            dataArray.push(100 * aData[day].crashes["OOP Plugin"] / aData[day].adi);
-            dataArray.push(100 * aData[day].crashes["Hang Plugin"] / aData[day].adi);
-          }
-          graphData.push(dataArray);
-        }
-
-        var colors = ["#004080"], labels = ["date"];
-        if (gBranches[gSelID].sumContent) {
-          labels.push("browser+content crashes");
-        }
-        else {
-          labels.push("browser crashes");
-        }
-        if (gBranches[gSelID].plugins) {
-          labels.push("plugin crashes");
-          labels.push("plugin hangs");
-          colors.push("#FF8000");
-          colors.push("#FFCC00");
-        }
-        var graphOptions = {
-          title: gBranches[gSelID].title,
-          ylabel: "crashes / 100 ADI",
-          valueRange: [0, gBranches[gSelID].maxRate + .01],
-          axes: {
-            x: {
-              axisLabelFormatter: function(aDate) {
-                return (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
-              },
-              valueFormatter: function(aMilliseconds) {
-                var dateValue = new Date(aMilliseconds);
-                return dateValue.getFullYear() + "-" +
-                  (dateValue.getMonth() < 9 ? "0" : "") + (dateValue.getMonth() + 1 ) + "-" +
-                  (dateValue.getDate() < 10 ? "0" : "") + dateValue.getDate();
-              },
-
-            },
-            y: {
-              axisLabelFormatter: function(aNumber) {
-                return aNumber.toFixed(1);
-              },
-              valueFormatter: function(aNumber) {
-                return aNumber.toFixed(2);
-              },
-            },
-          },
-          colors: colors,
-          strokeWidth: 2,
-          legend: 'always',
-          labels: labels,
-          labelsSeparateLines: true,
-          labelsShowZeroValues: true,
-          width: gBody.clientWidth,
-          height: gBody.clientHeight - graphDiv.offsetTop,
-        };
-
-        gGraph = new Dygraph(graphDiv, graphData, graphOptions);
-        gGraph.ready(function() {
-          fetchFile(gDataPath + gBranches[gSelID].annotationfile, "json",
-            function(aData) {
-              if (aData) {
-                // Convert dates to Date objects so they can be displayed.
-                for (var i = 0; i < aData.length; i++) {
-                  aData[i]["x"] = Date.parse(aData[i]["x"]);
-                }
-                if (gDataIssueDays) {
-                  for (var i = 0; i < gDataIssueDays.length; i++) {
-                    aData.push({
-                      series: labels[labels.length - 1],
-                      x: Date.parse(gDataIssueDays[i]),
-                      shortText: "D",
-                      text: "Data Issue (missing ADI or crashes)",
-                      attachAtBottom: true,
-                      cssClass: "dataissue",
-                    });
-                  }
-                }
-                gGraph.setAnnotations(aData);
-              }
-              else {
-                console.log("Error loading annotation data.");
-              }
-            }
-          );
-          console.log("foo");
-        });
-      }
-      else {
-        // ERROR! We're screwed!
-        graphDiv.textContent = "Error loading JSON data.";
-      }
-    }
-  );
+  fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
 }
 
 window.onresize = function() {
@@ -197,6 +100,120 @@ window.onresize = function() {
     gBody.clientWidth,
     gBody.clientHeight - graphDiv.offsetTop
   );
+}
+
+function graphData(aData) {
+  var graphDiv = document.getElementById("graphdiv");
+  gRawData = aData;
+  if (aData) {
+    var graphData = [], dataArray, browserCrashes;
+    var crUnit = (gBranches[gSelID].maxCrashes > 1e6) ? "M" : "k";
+    var crUnitNum = (gBranches[gSelID].maxCrashes > 1e6) ? 1e6 : 1e3;
+    var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
+    var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+    // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
+    for (var day in aData) {
+      dataArray = [ new Date(day) ];
+      if (gBranches[gSelID].sumContent) {
+        browserCrashes = 0;
+        if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
+        if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
+        dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+      }
+      else {
+        dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+      }
+      if (gBranches[gSelID].plugins) {
+        dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+      }
+      graphData.push(dataArray);
+    }
+
+    var colors = ["#004080"], labels = ["date"];
+    if (gBranches[gSelID].sumContent) {
+      labels.push("browser+content crashes");
+    }
+    else {
+      labels.push("browser crashes");
+    }
+    if (gBranches[gSelID].plugins) {
+      labels.push("plugin crashes");
+      labels.push("plugin hangs");
+      colors.push("#FF8000");
+      colors.push("#FFCC00");
+    }
+    var graphOptions = {
+      title: gBranches[gSelID].title,
+      ylabel: gUseADI ? "crashes / 100 ADI" : "crashes",
+      valueRange: [0, yAxisMax + .01],
+      axes: {
+        x: {
+          axisLabelFormatter: function(aDate) {
+            return (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+          },
+          valueFormatter: function(aMilliseconds) {
+            var dateValue = new Date(aMilliseconds);
+            return dateValue.getFullYear() + "-" +
+              (dateValue.getMonth() < 9 ? "0" : "") + (dateValue.getMonth() + 1 ) + "-" +
+              (dateValue.getDate() < 10 ? "0" : "") + dateValue.getDate();
+          },
+
+        },
+        y: {
+          axisLabelFormatter: function(aNumber) {
+            return aNumber.toFixed(yAxisDecimals) + (gUseADI ? "" : crUnit);
+          },
+          valueFormatter: function(aNumber) {
+            return aNumber.toFixed(2) + (gUseADI ? "" : crUnit);
+          },
+        },
+      },
+      colors: colors,
+      strokeWidth: 2,
+      legend: 'always',
+      labels: labels,
+      labelsSeparateLines: true,
+      labelsShowZeroValues: true,
+      width: gBody.clientWidth,
+      height: gBody.clientHeight - graphDiv.offsetTop,
+    };
+
+    gGraph = new Dygraph(graphDiv, graphData, graphOptions);
+    gGraph.ready(function() {
+      fetchFile(gDataPath + gBranches[gSelID].annotationfile, "json",
+        function(aData) {
+          if (aData) {
+            // Convert dates to Date objects so they can be displayed.
+            for (var i = 0; i < aData.length; i++) {
+              aData[i]["x"] = Date.parse(aData[i]["x"]);
+            }
+            if (gDataIssueDays) {
+              for (var i = 0; i < gDataIssueDays.length; i++) {
+                aData.push({
+                  series: labels[labels.length - 1],
+                  x: Date.parse(gDataIssueDays[i]),
+                  shortText: "D",
+                  text: "Data Issue (missing ADI or crashes)",
+                  attachAtBottom: true,
+                  cssClass: "dataissue",
+                });
+              }
+            }
+            gGraph.setAnnotations(aData);
+          }
+          else {
+            console.log("Error loading annotation data.");
+          }
+        }
+      );
+      console.log("foo");
+    });
+  }
+  else {
+    // ERROR! We're screwed!
+    graphDiv.textContent = "Error loading JSON data.";
+  }
 }
 
 function fetchFile(aURL, aFormat, aCallback) {
