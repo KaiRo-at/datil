@@ -323,7 +323,7 @@ var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
 var gAnalysisPath = "../../";
-var gBzAPIPath = "https://api-dev.bugzilla.mozilla.org/latest/";
+var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 
 window.onload = function() {
