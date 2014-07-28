@@ -158,7 +158,6 @@ function graphData(aData) {
               (dateValue.getUTCMonth() < 9 ? "0" : "") + (dateValue.getUTCMonth() + 1 ) + "-" +
               (dateValue.getUTCDate() < 10 ? "0" : "") + dateValue.getUTCDate();
           },
-
         },
         y: {
           axisLabelFormatter: function(aNumber) {
