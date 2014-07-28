@@ -150,13 +150,13 @@ function graphData(aData) {
       axes: {
         x: {
           axisLabelFormatter: function(aDate) {
-            return (aDate.getMonth() + 1) + "/" + aDate.getFullYear();
+            return (aDate.getUTCMonth() + 1) + "/" + aDate.getUTCFullYear();
           },
           valueFormatter: function(aMilliseconds) {
             var dateValue = new Date(aMilliseconds);
-            return dateValue.getFullYear() + "-" +
-              (dateValue.getMonth() < 9 ? "0" : "") + (dateValue.getMonth() + 1 ) + "-" +
-              (dateValue.getDate() < 10 ? "0" : "") + dateValue.getDate();
+            return dateValue.getUTCFullYear() + "-" +
+              (dateValue.getUTCMonth() < 9 ? "0" : "") + (dateValue.getUTCMonth() + 1 ) + "-" +
+              (dateValue.getUTCDate() < 10 ? "0" : "") + dateValue.getUTCDate();
           },
 
         },
