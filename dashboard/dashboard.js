@@ -44,7 +44,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "32.0.1",
+        version: "32.0.2",
         appendver: true,
         adu: { low: 7e7, min: 2e7 },
         rate: { factor: 1, high: 1.5, max: 1.75 },
