@@ -30,6 +30,24 @@ var gBranches = {
     maxRate: 3,
     maxCrashes: 80e3,
   },
+  andaurora: {
+    title: "Firefox Aurora / DevEdition channel",
+    datafile: "Firefox-aurora-bytype.json",
+    annotationfile: "Firefox-aurora-annotations.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 20,
+    maxCrashes: 10e3,
+  },
+  andnightly: {
+    title: "Firefox Nightly channel",
+    datafile: "Firefox-nightly-bytype.json",
+    annotationfile: "Firefox-nightly-annotations.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 30,
+    maxCrashes: 10e3,
+  },
   andrel: {
     title: "Firefox for Android release channel",
     datafile: "FennecAndroid-release-bytype.json",
@@ -46,7 +64,7 @@ var gBranches = {
     plugins: false,
     sumContent: false,
     maxRate: 11,
-    maxCrashes: 10e3,
+    maxCrashes: 1e3,
   },
   andaurora: {
     title: "Firefox for Android Aurora channel",
@@ -55,7 +73,7 @@ var gBranches = {
     plugins: false,
     sumContent: false,
     maxRate: 20,
-    maxCrashes: 10e3,
+    maxCrashes: 1e3,
   },
   andnightly: {
     title: "Firefox for Android Nightly channel",
@@ -63,8 +81,8 @@ var gBranches = {
     annotationfile: "FennecAndroid-nightly-annotations.json",
     plugins: false,
     sumContent: false,
-    maxRate: 20,
-    maxCrashes: 10e3,
+    maxRate: 30,
+    maxCrashes: 1e3,
   },
 }
 
