@@ -45,7 +45,7 @@ var gBranches = {
     annotationfile: "Firefox-nightly-annotations.json",
     plugins: true,
     sumContent: true,
-    maxRate: 10,
+    maxRate: 15,
     maxCrashes: 15e3,
   },
   andrel: {
