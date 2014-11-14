@@ -48,6 +48,24 @@ var gBranches = {
     maxRate: 11,
     maxCrashes: 10e3,
   },
+  andaurora: {
+    title: "Firefox for Android Aurora channel",
+    datafile: "FennecAndroid-aurora-bytype.json",
+    annotationfile: "FennecAndroid-aurora-annotations.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 20,
+    maxCrashes: 10e3,
+  },
+  andnightly: {
+    title: "Firefox for Android Nightly channel",
+    datafile: "FennecAndroid-nightly-bytype.json",
+    annotationfile: "FennecAndroid-nightly-annotations.json",
+    plugins: false,
+    sumContent: false,
+    maxRate: 20,
+    maxCrashes: 10e3,
+  },
 }
 
 window.onload = function() {
