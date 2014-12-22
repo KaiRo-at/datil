@@ -5,7 +5,7 @@
 // See http://dygraphs.com/ for graphs documentation.
 
 var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox, gDataIssueDays,
-    gRawData, gUseADI = true;
+    gRawData, gUseADI = true, gADIGraph = false;
 
 var gDataPath = "../../";
 // for local debugging
@@ -20,6 +20,7 @@ var gBranches = {
     sumContent: true,
     maxRate: 3,
     maxCrashes: 2.2e6,
+    maxADI: 130e6,
   },
   fxbeta: {
     title: "Firefox beta channel",
@@ -29,6 +30,7 @@ var gBranches = {
     sumContent: true,
     maxRate: 3,
     maxCrashes: 80e3,
+    maxADI: 3.5e6,
   },
   fxaurora: {
     title: "Firefox Aurora / DevEdition channel",
@@ -38,6 +40,7 @@ var gBranches = {
     sumContent: true,
     maxRate: 10,
     maxCrashes: 5e3,
+    maxADI: 180e3,
   },
   fxnightly: {
     title: "Firefox Nightly channel",
@@ -47,6 +50,7 @@ var gBranches = {
     sumContent: true,
     maxRate: 15,
     maxCrashes: 15e3,
+    maxADI: 140e3,
   },
   andrel: {
     title: "Firefox for Android release channel",
@@ -56,6 +60,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 4,
     maxCrashes: 100e3,
+    maxADI: 5e6,
   },
   andbeta: {
     title: "Firefox for Android beta channel",
@@ -65,6 +70,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 11,
     maxCrashes: 1e3,
+    maxADI: 120e3,
   },
   andaurora: {
     title: "Firefox for Android Aurora channel",
@@ -74,6 +80,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 25,
     maxCrashes: 1e3,
+    maxADI: 5e3,
   },
   andnightly: {
     title: "Firefox for Android Nightly channel",
@@ -83,6 +90,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 50,
     maxCrashes: 1e3,
+    maxADI: 6e3,
   },
 }
 
@@ -91,7 +99,7 @@ window.onload = function() {
   gBody = document.getElementsByTagName("body")[0];
   gBranchSelect = document.getElementById("branch");
   gBranchSelect.onchange = function() {
-    location.href = '?' + gBranchSelect.value;
+    location.href = "?" + gBranchSelect.value + (gADIGraph ? "-adi" : "");
   }
   var option;
   for (var branchID in gBranches) {
@@ -109,9 +117,23 @@ window.onload = function() {
 
   if (location.search) {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
+    var urlAParts = urlAnchor.split("-");
+    if (urlAParts.length > 1) {
+      if (urlAParts[1] == "adi") {
+        gADIGraph = true;
+        gUseADI = false; // This turns on the usage of units like 'M' and 'k'.
+        document.getElementsByTagName("h1")[0].textContent = "ADI History";
+        document.title = "ADI History";
+        document.getElementById("selectorsubline").hidden = true;
+      }
+      urlAnchor = urlAParts[0];
+    }
     if (urlAnchor in gBranches) {
       gSelID = urlAnchor;
       gBranchSelect.value = urlAnchor;
+    }
+    else {
+      location.href = "?fxrel";
     }
   }
   else {
@@ -143,45 +165,63 @@ function graphData(aData) {
   gRawData = aData;
   if (aData) {
     var graphData = [], dataArray, browserCrashes;
-    var crUnit = (gBranches[gSelID].maxCrashes > 1e6) ? "M" : "k";
-    var crUnitNum = (gBranches[gSelID].maxCrashes > 1e6) ? 1e6 : 1e3;
-    var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
-    var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+    if (gADIGraph) {
+      var crUnit = (gBranches[gSelID].maxADI > 1e6) ? "M" : "k";
+      var crUnitNum = (gBranches[gSelID].maxADI > 1e6) ? 1e6 : 1e3;
+      var yAxisMax = gBranches[gSelID].maxADI / crUnitNum;
+      var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+    }
+    else {
+      var crUnit = (gBranches[gSelID].maxCrashes > 1e6) ? "M" : "k";
+      var crUnitNum = (gBranches[gSelID].maxCrashes > 1e6) ? 1e6 : 1e3;
+      var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
+      var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+    }
     // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
     for (var day in aData) {
       dataArray = [ new Date(day) ];
-      if (gBranches[gSelID].sumContent) {
-        browserCrashes = 0;
-        if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
-        if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
-        dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+      if (gADIGraph) {
+        dataArray.push(aData[day].adi / crUnitNum);
       }
       else {
-        dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-      }
-      if (gBranches[gSelID].plugins) {
-        dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-        dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        if (gBranches[gSelID].sumContent) {
+          browserCrashes = 0;
+          if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
+          if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
+          dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        if (gBranches[gSelID].plugins) {
+          dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
       }
       graphData.push(dataArray);
     }
 
     var colors = ["#004080"], labels = ["date"];
-    if (gBranches[gSelID].sumContent) {
-      labels.push("browser+content crashes");
+    if (gADIGraph) {
+      labels.push("ADI");
     }
     else {
-      labels.push("browser crashes");
-    }
-    if (gBranches[gSelID].plugins) {
-      labels.push("plugin crashes");
-      labels.push("plugin hangs");
-      colors.push("#FF8000");
-      colors.push("#FFCC00");
+      if (gBranches[gSelID].sumContent) {
+        labels.push("browser+content crashes");
+      }
+      else {
+        labels.push("browser crashes");
+      }
+      if (gBranches[gSelID].plugins) {
+        labels.push("plugin crashes");
+        labels.push("plugin hangs");
+        colors.push("#FF8000");
+        colors.push("#FFCC00");
+      }
     }
     var graphOptions = {
       title: gBranches[gSelID].title,
-      ylabel: gUseADI ? "crashes / 100 ADI" : "crashes",
+      ylabel: gADIGraph ? "ADI" : (gUseADI ? "crashes / 100 ADI" : "crashes"),
       valueRange: [0, yAxisMax + .01],
       axes: {
         x: {
@@ -221,7 +261,12 @@ function graphData(aData) {
           if (aData) {
             // Convert dates to Date objects so they can be displayed.
             for (var i = 0; i < aData.length; i++) {
-              aData[i]["x"] = Date.parse(aData[i]["x"]);
+              aData[i].x = Date.parse(aData[i].x);
+              if (gADIGraph &&
+                  (aData[i].series == "browser+content crashes" ||
+                   aData[i].series == "browser crashes")) {
+                aData[i].series = "ADI";
+              }
             }
             if (gDataIssueDays) {
               for (var i = 0; i < gDataIssueDays.length; i++) {
