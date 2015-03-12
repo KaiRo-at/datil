@@ -11,33 +11,40 @@ var gSocorroPath = "https://crash-stats.mozilla.com/";
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
 var gProduct = "Firefox", gVersion = "37.0b3", gProcess = "browser";
 var gDate, gDuration = 7;
-var gScores = {};
+var gScores = {}, gSocorroAPIToken;
 
 
 window.onload = function() {
   gDebug = document.getElementById("debug");
   gLog = document.getElementById("debugLog");
+  gSocorroAPIToken = getParameterByName("token");
 
-  fetchFile(gSocorroPath + "api/CrontabberState/", "json",
-    function(aData) {
-      if (aData) {
-        var matviewTime = new Date(aData.state["signatures-matview"].last_success);
-        matviewTime.setDate(matviewTime.getDate() - 1); // subtract one day
-        gDate = makeDate(matviewTime);
-        document.getElementById("repDate").textContent = gDate;
-        document.getElementById("repDuration").textContent = gDuration;
-        document.getElementById("repProd").textContent = gProduct;
-        document.getElementById("repVer").textContent = gVersion;
-        document.getElementById("repPType").textContent = gProcess;
+  if (!gSocorroAPIToken) {
+    // Tokens can be had at https://crash-stats.mozilla.com/api/tokens/
+    printError("ERROR - you need an API token. Please create one via Socorro and hand it over with the ?token=... parameter!");
+  }
+  else {
+    fetchFile(gSocorroPath + "api/CrontabberState/", "json",
+      function(aData) {
+        if (aData) {
+          var matviewTime = new Date(aData.state["signatures-matview"].last_success);
+          matviewTime.setDate(matviewTime.getDate() - 1); // subtract one day
+          gDate = makeDate(matviewTime);
+          document.getElementById("repDate").textContent = gDate;
+          document.getElementById("repDuration").textContent = gDuration;
+          document.getElementById("repProd").textContent = gProduct;
+          document.getElementById("repVer").textContent = gVersion;
+          document.getElementById("repPType").textContent = gProcess;
 
-        processData();
+          processData();
+        }
+        else {
+          gDate = null;
+          printError("ERROR - couldn't find crobtabber state!");
+        }
       }
-      else {
-        gDate = null;
-        document.getElementById("repDate").textContent = "ERROR - couldn't find crobtabber state!";
-      }
-    }
-  );
+    );
+  }
 }
 
 function processData() {
@@ -83,9 +90,7 @@ function processData() {
         }
       }
       else {
-        var trow = tblBody.appendChild(document.createElement('tr'));
-        var cell = trow.appendChild(document.createElement('td'));
-        cell.textContent = "ERROR - couldn't find TCBS data!";
+        printError("ERROR - couldn't find TCBS data!");
       }
     }
   );
@@ -129,6 +134,13 @@ function calcScore(aSignature, aCallback) {
   );
 }
 
+function printError(aErrorMessage) {
+  var trow = document.getElementById("scoreTBody")
+                     .appendChild(document.createElement('tr'));
+  var cell = trow.appendChild(document.createElement('td'));
+  cell.textContent = aErrorMessage;
+}
+
 function fetchFile(aURL, aFormat, aCallback) {
   var XHR = new XMLHttpRequest();
   XHR.onreadystatechange = function() {
@@ -153,6 +165,7 @@ function fetchFile(aURL, aFormat, aCallback) {
     }
   };
   XHR.open("GET", aURL);
+  XHR.setRequestHeader("Auth-Token", gSocorroAPIToken);
   if (aFormat == "json") { XHR.setRequestHeader("Accept", "application/json"); }
   else if (aFormat == "xml") { XHR.setRequestHeader("Accept", "application/xml"); }
   try {
@@ -170,4 +183,12 @@ function makeDate(aDate) {
   return aDate.getUTCFullYear() + "-" +
          (aDate.getUTCMonth() < 9 ? "0" : "") + (aDate.getUTCMonth() + 1 ) + "-" +
          (aDate.getUTCDate() < 10 ? "0" : "") + aDate.getUTCDate();
+}
+
+function getParameterByName(aName) {
+  // from http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  name = aName.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
