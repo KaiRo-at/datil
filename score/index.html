@@ -1,0 +1,33 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Crash Score Prototype</title>
+  <script src="score.js"></script>
+  <link rel="stylesheet" href="score.css">
+</head>
+<body>
+<h1>Crash Score Prototype</h1>
+<p id="dataLine">Analyzed date: <span id="repDate"></span>
+(<span id="repDuration"></span> days)
+- <span id="repProd"></span> version: <span id="repVer"></span>
+- <span id="repPType"></span> crashes</p>
+<p class="help">Note: This is a prototype, see the
+<a href="https://etherpad.mozilla.org/topcrash-weighted">etherpad</a>
+for notes.</p>
+
+<table border="1">
+<thead id="scoreTHeader">
+</thead>
+<tbody id="scoreTBody">
+</tbody>
+</table>
+
+<p id="debug"></p>
+<ul id="debugLog"></ul>
+</body>
+</html>
