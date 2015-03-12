@@ -20,8 +20,11 @@ window.onload = function() {
   gSocorroAPIToken = getParameterByName("token");
 
   //if (!gSocorroAPIToken) {
-  //  // Tokens can be had at https://crash-stats.mozilla.com/api/tokens/
-  //  printError("ERROR - you need an API token. Please create one via Socorro and hand it over with the ?token=... parameter!");
+  //  $err = displayError("ERROR - you need an API token. Please ");
+  //  $link = $err.appendChild(document.createElement("a"));
+  //  $link.setAttribute("href", "https://crash-stats.mozilla.com/api/tokens/");
+  //  $link.textContent = "create one via Socorro";
+  //  $err.appendChild(document.createTextNode(" and hand it over with the ?token=... parameter!"));
   //}
   //else {
     fetchFile(gSocorroPath + "api/CrontabberState/", "json",
@@ -40,7 +43,7 @@ window.onload = function() {
         }
         else {
           gDate = null;
-          printError("ERROR - couldn't find crobtabber state!");
+          displayError("ERROR - couldn't find crobtabber state!");
         }
       }
     );
@@ -55,7 +58,8 @@ function processData() {
             "&end_date=" + gDate + "&limit=" + limit, "json",
     function(aData) {
       if (aData) {
-        console.log("found TCBS results: " + aData.crashes.length);
+        var resultCount = aData.crashes.length;
+        console.log("found TCBS results: " + resultCount);
         // Header
         var trow = document.getElementById("scoreTHeader").appendChild(document.createElement("tr"));
         var cell = trow.appendChild(document.createElement("th"));
@@ -65,7 +69,7 @@ function processData() {
         var cell = trow.appendChild(document.createElement("th"));
         cell.textContent = "Score";
         // Body
-        for (var i = 0; i <= aData.crashes.length - 1; i++) {
+        for (var i = 0; i <= resultCount - 1; i++) {
           gScores[aData.crashes[i].signature] = aData.crashes[i];
           var trow = tblBody.appendChild(document.createElement("tr"));
           trow.setAttribute("id", "sdata_" + encodeURIComponent(aData.crashes[i].signature));
@@ -90,10 +94,14 @@ function processData() {
         }
       }
       else {
-        printError("ERROR - couldn't find TCBS data!");
+        displayError("ERROR - couldn't find TCBS data!");
       }
     }
   );
+}
+
+function printData() {
+  var tblBody = document.getElementById("scoreTBody");
 }
 
 function calcScore(aSignature, aCallback) {
@@ -134,11 +142,12 @@ function calcScore(aSignature, aCallback) {
   );
 }
 
-function printError(aErrorMessage) {
+function displayError(aErrorMessage) {
   var trow = document.getElementById("scoreTBody")
                      .appendChild(document.createElement('tr'));
   var cell = trow.appendChild(document.createElement('td'));
   cell.textContent = aErrorMessage;
+  return cell;
 }
 
 function fetchFile(aURL, aFormat, aCallback) {
