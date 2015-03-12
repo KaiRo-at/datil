@@ -19,11 +19,11 @@ window.onload = function() {
   gLog = document.getElementById("debugLog");
   gSocorroAPIToken = getParameterByName("token");
 
-  if (!gSocorroAPIToken) {
-    // Tokens can be had at https://crash-stats.mozilla.com/api/tokens/
-    printError("ERROR - you need an API token. Please create one via Socorro and hand it over with the ?token=... parameter!");
-  }
-  else {
+  //if (!gSocorroAPIToken) {
+  //  // Tokens can be had at https://crash-stats.mozilla.com/api/tokens/
+  //  printError("ERROR - you need an API token. Please create one via Socorro and hand it over with the ?token=... parameter!");
+  //}
+  //else {
     fetchFile(gSocorroPath + "api/CrontabberState/", "json",
       function(aData) {
         if (aData) {
@@ -44,7 +44,7 @@ window.onload = function() {
         }
       }
     );
-  }
+  //}
 }
 
 function processData() {
@@ -165,7 +165,8 @@ function fetchFile(aURL, aFormat, aCallback) {
     }
   };
   XHR.open("GET", aURL);
-  XHR.setRequestHeader("Auth-Token", gSocorroAPIToken);
+  // XXX: Should work but doesn't yet! I need to talk to peterbe about that.
+  // XHR.setRequestHeader("Auth-Token", gSocorroAPIToken);
   if (aFormat == "json") { XHR.setRequestHeader("Accept", "application/json"); }
   else if (aFormat == "xml") { XHR.setRequestHeader("Accept", "application/xml"); }
   try {
