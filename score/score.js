@@ -61,6 +61,7 @@ function processData() {
         for (var i = 0; i <= aData.crashes.length - 1; i++) {
           gScores[aData.crashes[i].signature] = aData.crashes[i];
           var trow = tblBody.appendChild(document.createElement("tr"));
+          trow.setAttribute("id", "sdata_" + encodeURIComponent(aData.crashes[i].signature));
           var cell = trow.appendChild(document.createElement("td"));
           cell.classList.add("sig");
           var link = cell.appendChild(document.createElement("a"));
@@ -73,10 +74,12 @@ function processData() {
           var cell = trow.appendChild(document.createElement("td"));
           cell.classList.add("num");
           cell.textContent = aData.crashes[i].count;
-          calcScore(aData.crashes[i].signature);
-          var cell = trow.appendChild(document.createElement("td"));
-          cell.classList.add("num");
-          cell.textContent = parseInt(aData.crashes[i].score);
+          calcScore(aData.crashes[i].signature, function(aSignature) {
+            var trow = document.getElementById("sdata_" + encodeURIComponent(aSignature));
+            var cell = trow.appendChild(document.createElement("td"));
+            cell.classList.add("num");
+            cell.textContent = parseInt(gScores[aSignature].score);
+          });
         }
       }
       else {
@@ -88,7 +91,7 @@ function processData() {
   );
 }
 
-function calcScore(aSignature) {
+function calcScore(aSignature, aCallback) {
   gScores[aSignature].score = gScores[aSignature].count;
   // Startup crashes: count each crash with factor 10
   gScores[aSignature].score *= 1 + gScores[aSignature].startup_percent * (10 - 1);
@@ -102,6 +105,28 @@ function calcScore(aSignature) {
   if (aSignature.startsWith("OOM | large")) {
     gScores[aSignature].score *= 5;
   }
+
+  // Get signature Summary data
+  var sigRepTypes = "distinct_install";
+  var startDate = new Date(gDate);
+  startDate.setDate(startDate.getDate() - gDuration);
+  fetchFile(gSocorroPath + "api/SignatureSummary/?versions=" + gProduct + ":" + gVersion +
+            "&signature=" + encodeURIComponent(aSignature) +
+            "&report_types=" + sigRepTypes +
+            "&start_date=" + makeDate(startDate) + "&end_date=" + gDate, "json",
+    function(aData) {
+      if (aData) {
+        // installations: factor 0 for <3 installs
+        if (aData.reports.distinct_install.installations < 3) {
+          gScores[aSignature].score *= 0;
+        }
+      }
+      else {
+        console.log("ERROR - couldn't find Signature Summara data for " + aSignature + "!");
+      }
+      aCallback(aSignature);
+    }
+  );
 }
 
 function fetchFile(aURL, aFormat, aCallback) {
@@ -123,6 +148,7 @@ function fetchFile(aURL, aFormat, aCallback) {
         aCallback(XHR.responseText);
     } else if (XHR.readyState == 4 && XHR.status != 200) {
       // fetched the wrong page or network error...
+      console.log("ERROR: XHR status " + XHR.status + " - " + aURL);
       aCallback(null);
     }
   };
@@ -133,6 +159,7 @@ function fetchFile(aURL, aFormat, aCallback) {
     XHR.send();
   }
   catch (e) {
+    console.log("ERROR: XHR send - " + e + " - " + aURL);
     aCallback(null);
   }
 }
