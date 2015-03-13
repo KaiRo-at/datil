@@ -20,7 +20,7 @@ window.onload = function() {
   gSocorroAPIToken = getParameterByName("token");
 
   //if (!gSocorroAPIToken) {
-  //  $err = displayError("ERROR - you need an API token. Please ");
+  //  $err = displayMessage("ERROR - you need an API token. Please ");
   //  $link = $err.appendChild(document.createElement("a"));
   //  $link.setAttribute("href", "https://crash-stats.mozilla.com/api/tokens/");
   //  $link.textContent = "create one via Socorro";
@@ -43,7 +43,7 @@ window.onload = function() {
         }
         else {
           gDate = null;
-          displayError("ERROR - couldn't find crobtabber state!");
+          displayMessage("ERROR - couldn't find crobtabber state!");
         }
       }
     );
@@ -59,49 +59,58 @@ function processData() {
     function(aData) {
       if (aData) {
         var resultCount = aData.crashes.length;
-        console.log("found TCBS results: " + resultCount);
-        // Header
-        var trow = document.getElementById("scoreTHeader").appendChild(document.createElement("tr"));
-        var cell = trow.appendChild(document.createElement("th"));
-        cell.textContent = "Signature";
-        var cell = trow.appendChild(document.createElement("th"));
-        cell.textContent = "Count";
-        var cell = trow.appendChild(document.createElement("th"));
-        cell.textContent = "Score";
-        // Body
+        displayMessage("Processing " + resultCount + " results…");
         for (var i = 0; i <= resultCount - 1; i++) {
           gScores[aData.crashes[i].signature] = aData.crashes[i];
-          var trow = tblBody.appendChild(document.createElement("tr"));
-          trow.setAttribute("id", "sdata_" + encodeURIComponent(aData.crashes[i].signature));
-          var cell = trow.appendChild(document.createElement("td"));
-          cell.classList.add("sig");
-          var link = cell.appendChild(document.createElement("a"));
-          link.setAttribute("href",
-              gSocorroPath + "report/list?product=" + gProduct +
-              "&version=" + gProduct + ":" + gVersion +
-              "&range_unit=days&range_value=" + gDuration + "&date=" + gDate +
-              "&signature=" + encodeURIComponent(aData.crashes[i].signature));
-          link.textContent = aData.crashes[i].signature;
-          var cell = trow.appendChild(document.createElement("td"));
-          cell.classList.add("num");
-          cell.textContent = aData.crashes[i].count;
           calcScore(aData.crashes[i].signature, function(aSignature) {
-            var trow = document.getElementById("sdata_" + encodeURIComponent(aSignature));
-            var cell = trow.appendChild(document.createElement("td"));
-            cell.classList.add("num");
-            cell.textContent = parseInt(gScores[aSignature].score);
+            if (aSignature == aData.crashes[resultCount-1].signature) {
+              buildDataTable();
+            }
           });
         }
       }
       else {
-        displayError("ERROR - couldn't find TCBS data!");
+        displayMessage("ERROR - couldn't find TCBS data!");
       }
     }
   );
 }
 
-function printData() {
+function buildDataTable() {
+  var msgRow = document.getElementById("message_row");
+  if (msgRow) {
+    msgRow.parentNode.removeChild(msgRow);
+  }
+  // Header
+  var trow = document.getElementById("scoreTHeader")
+                     .appendChild(document.createElement("tr"));
+  var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "Signature";
+  var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "Count";
+  var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "Score";
+  // Body
   var tblBody = document.getElementById("scoreTBody");
+  for (var signature in gScores) {
+    var trow = tblBody.appendChild(document.createElement("tr"));
+    trow.setAttribute("id", "sdata_" + encodeURIComponent(signature));
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("sig");
+    var link = cell.appendChild(document.createElement("a"));
+    link.setAttribute("href",
+        gSocorroPath + "report/list?product=" + gProduct +
+        "&version=" + gProduct + ":" + gVersion +
+        "&range_unit=days&range_value=" + gDuration + "&date=" + gDate +
+        "&signature=" + encodeURIComponent(signature));
+    link.textContent = signature;
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("num");
+    cell.textContent = gScores[signature].count;
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("num");
+    cell.textContent = parseInt(gScores[signature].score);
+  }
 }
 
 function calcScore(aSignature, aCallback) {
@@ -135,16 +144,17 @@ function calcScore(aSignature, aCallback) {
         }
       }
       else {
-        console.log("ERROR - couldn't find Signature Summara data for " + aSignature + "!");
+        console.log("ERROR - couldn't find Signature Summary data for " + aSignature + "!");
       }
       aCallback(aSignature);
     }
   );
 }
 
-function displayError(aErrorMessage) {
+function displayMessage(aErrorMessage) {
   var trow = document.getElementById("scoreTBody")
                      .appendChild(document.createElement('tr'));
+  trow.setAttribute("id", "message_row");
   var cell = trow.appendChild(document.createElement('td'));
   cell.textContent = aErrorMessage;
   return cell;
