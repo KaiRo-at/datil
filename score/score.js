@@ -64,6 +64,7 @@ function processData() {
           gScores[aData.crashes[i].signature] = aData.crashes[i];
           calcScore(aData.crashes[i].signature, function(aSignature) {
             if (aSignature == aData.crashes[resultCount-1].signature) {
+              // last item, so all done with calculating
               buildDataTable();
             }
           });
@@ -92,7 +93,11 @@ function buildDataTable() {
   cell.textContent = "Score";
   // Body
   var tblBody = document.getElementById("scoreTBody");
-  for (var signature in gScores) {
+  var sigSorted = Object.keys(gScores).sort(
+    function (a, b) { return gScores[b].score - gScores[a].score; }
+  );
+  for (var i = 0; i <= sigSorted.length - 1; i++) {
+    signature = sigSorted[i];
     var trow = tblBody.appendChild(document.createElement("tr"));
     trow.setAttribute("id", "sdata_" + encodeURIComponent(signature));
     var cell = trow.appendChild(document.createElement("td"));
@@ -138,10 +143,19 @@ function calcScore(aSignature, aCallback) {
             "&start_date=" + makeDate(startDate) + "&end_date=" + gDate, "json",
     function(aData) {
       if (aData) {
+        gScores[aSignature].installations = aData.reports.distinct_install[0].installations;
         // installations: factor 0 for <3 installs
-        if (aData.reports.distinct_install.installations < 3) {
+        if (aData.reports.distinct_install[0].installations < 3) {
           gScores[aSignature].score *= 0;
         }
+        // installations: factor up to 2 for few people crashing over and over,
+        //                factor 1 for installations == crashes
+        // 1+e^(x*-3)*sin(x*pi)*3 - prototyped via http://www.mathe-fa.de/en
+        var instRatio = aData.reports.distinct_install[0].installations /
+                        aData.reports.distinct_install[0].crashes;
+        gScores[aSignature].score *= 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+        gScores[aSignature].installations_factor = 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+        gScores[aSignature].installations_ratio = instRatio;
       }
       else {
         console.log("ERROR - couldn't find Signature Summary data for " + aSignature + "!");
