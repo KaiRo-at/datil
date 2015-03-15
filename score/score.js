@@ -198,8 +198,11 @@ function fetchFile(aURL, aFormat, aCallback) {
     }
   };
   XHR.open("GET", aURL);
-  // XXX: Should work but doesn't yet! I need to talk to peterbe about that.
-  // XHR.setRequestHeader("Auth-Token", gSocorroAPIToken);
+  if (gSocorroAPIToken) {
+    // XXX: Should work but doesn't yet! I need to talk to peterbe about that.
+    //      Use this path when we have a token so bug 1xxxxxx can be tested.
+    XHR.setRequestHeader("Auth-Token", gSocorroAPIToken);
+  }
   if (aFormat == "json") { XHR.setRequestHeader("Accept", "application/json"); }
   else if (aFormat == "xml") { XHR.setRequestHeader("Accept", "application/xml"); }
   try {
