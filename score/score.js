@@ -9,7 +9,7 @@ var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
-var gProduct = "Firefox", gVersion = "37.0b3", gProcess = "browser";
+var gProduct = "Firefox", gVersion = "37.0b7", gProcess = "browser";
 var gDate, gDuration = 7;
 var gScores = {}, gSocorroAPIToken;
 
