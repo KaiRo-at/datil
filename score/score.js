@@ -9,7 +9,7 @@ var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
-var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser";
+var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser", gLimit = 10; //300;
 var gDate, gDuration = 7;
 var gScores = {}, gSocorroAPIToken;
 
@@ -22,6 +22,10 @@ window.onload = function() {
   var ver = getParameterByName("version");
   if (ver.match(/^(\d+\.)+[\dab]+/)) {
     gVersion = ver;
+  }
+  var limit = getParameterByName("limit");
+  if (limit.match(/^(\d+)+/) && (limit >= 3) && (limit <= 1000)) {
+    gLimit = limit;
   }
 
   //if (!gSocorroAPIToken) {
@@ -57,10 +61,9 @@ window.onload = function() {
 
 function processData() {
   var tblBody = document.getElementById("scoreTBody");
-  var limit = 10; //300;
   fetchFile(gSocorroPath + "api/TCBS/?product=" + gProduct + "&version=" + gVersion +
             "&crash_type=" + gProcess + "&date_range_type=" + gDuration +
-            "&end_date=" + gDate + "&limit=" + limit, "json",
+            "&end_date=" + gDate + "&limit=" + gLimit, "json",
     function(aData) {
       if (aData) {
         var resultCount = aData.crashes.length;
@@ -91,6 +94,9 @@ function buildDataTable() {
   var trow = document.getElementById("scoreTHeader")
                      .appendChild(document.createElement("tr"));
   var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "#";
+  cell.setAttribute("title", "Rank");
+  var cell = trow.appendChild(document.createElement("th"));
   cell.textContent = "Signature";
   var cell = trow.appendChild(document.createElement("th"));
   cell.textContent = "Count";
@@ -105,6 +111,9 @@ function buildDataTable() {
     signature = sigSorted[i];
     var trow = tblBody.appendChild(document.createElement("tr"));
     trow.setAttribute("id", "sdata_" + encodeURIComponent(signature));
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.textContent = i + 1;
+    cell.classList.add("rank");
     var cell = trow.appendChild(document.createElement("td"));
     cell.classList.add("sig");
     var link = cell.appendChild(document.createElement("a"));
