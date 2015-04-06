@@ -9,7 +9,7 @@ var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
-var gProduct = "Firefox", gVersion = "37.0b7", gProcess = "browser";
+var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser";
 var gDate, gDuration = 7;
 var gScores = {}, gSocorroAPIToken;
 
@@ -18,6 +18,11 @@ window.onload = function() {
   gDebug = document.getElementById("debug");
   gLog = document.getElementById("debugLog");
   gSocorroAPIToken = getParameterByName("token");
+
+  var ver = getParameterByName("version");
+  if (ver.match(/^(\d+\.)+[\dab]+/)) {
+    gVersion = ver;
+  }
 
   //if (!gSocorroAPIToken) {
   //  $err = displayMessage("ERROR - you need an API token. Please ");
