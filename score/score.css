@@ -38,12 +38,24 @@ th {
 .sig {
   font-size: small;
   text-align: left;
-  vertical-align: top;
+/*  vertical-align: top;*/
 }
 
 .num {
   text-align: right;
   vertical-align: middle;
+}
+
+.bugs {
+  font-size: small;
+}
+
+.bugs > a[data-status="RESOLVED"] {
+  text-decoration: line-through;
+}
+
+.bugs > a[data-status="RESOLVED"]:not([data-resolution="FIXED"]):not(:hover) {
+ opacity: 0.5;
 }
 
 #debugLog {

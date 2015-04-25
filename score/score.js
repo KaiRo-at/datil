@@ -11,7 +11,7 @@ var gSocorroPath = "https://crash-stats.mozilla.com/";
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
 var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser", gLimit = 10; //300;
 var gDate, gDuration = 7;
-var gScores = {}, gSocorroAPIToken;
+var gScores = {}, gSocorroAPIToken, gBugInfo = {};
 
 
 window.onload = function() {
@@ -74,6 +74,7 @@ function processData() {
             if (aSignature == aData.crashes[resultCount-1].signature) {
               // last item, so all done with calculating
               buildDataTable();
+              fetchBugs();
             }
           });
         }
@@ -83,6 +84,27 @@ function processData() {
       }
     }
   );
+}
+
+function fetchBugs() {
+  for (var signature in gScores) {
+    gScores[signature].bugs = [];
+    fetchFile(gSocorroPath + "api/Bugs/?signatures=" + encodeURIComponent(signature), "json",
+      function(aSignature, aData) {
+        if (aData) {
+          for (var i = 0; i <= aData.hits.length - 1; i++) {
+            if (aData.hits[i].signature == aSignature) {
+              gScores[aSignature].bugs.push(aData.hits[i].id);
+            }
+          }
+          buildBugsField(aSignature);
+        }
+        else {
+          console.log("ERROR - couldn't find bug data for " + aSignature + "!");
+        }
+      }.bind(undefined, signature) // Prepend signature to the argument list.
+    );
+  }
 }
 
 function buildDataTable() {
@@ -99,9 +121,13 @@ function buildDataTable() {
   var cell = trow.appendChild(document.createElement("th"));
   cell.textContent = "Signature";
   var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "Bugs";
+  var cell = trow.appendChild(document.createElement("th"));
   cell.textContent = "Count";
   var cell = trow.appendChild(document.createElement("th"));
   cell.textContent = "Score";
+  var cell = trow.appendChild(document.createElement("th"));
+  cell.textContent = "Reasons";
   // Body
   var tblBody = document.getElementById("scoreTBody");
   var sigSorted = Object.keys(gScores).sort(
@@ -124,11 +150,69 @@ function buildDataTable() {
         "&signature=" + encodeURIComponent(signature));
     link.textContent = signature;
     var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("bugs");
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("count");
     cell.classList.add("num");
     cell.textContent = gScores[signature].count;
     var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("score");
     cell.classList.add("num");
     cell.textContent = parseInt(gScores[signature].score);
+    var cell = trow.appendChild(document.createElement("td"));
+    cell.classList.add("reasons");
+  }
+}
+
+function buildBugsField(aSignature) {
+  var sigRow = document.getElementById("sdata_" + encodeURIComponent(aSignature));
+  var bugsField = sigRow.querySelector(".bugs");
+  for (var i = 0; i <= gScores[aSignature].bugs.length - 1; i++) {
+    if (i > 0) { // Add spaces when we have multiple bugs.
+      bugsField.appendChild(document.createTextNode(" "));
+    }
+    var link = bugsField.appendChild(document.createElement("a"));
+    link.dataset["bugid"] = gScores[aSignature].bugs[i];
+    link.setAttribute("href",
+        gBzBasePath + "show_bug.cgi?id=" + gScores[aSignature].bugs[i]);
+    link.textContent = gScores[aSignature].bugs[i];
+    // Add Bugzilla data.
+    if (gBugInfo[gScores[aSignature].bugs[i]]) {
+      beautifyBugzillaLink(link);
+    }
+    else {
+      fetchFile(gBzBasePath + "rest/bug/" + gScores[aSignature].bugs[i] + "?include_fields=id,summary,status,resolution", "json",
+        function(aLink, aData) {
+          if (aData && aData.bugs && aData.bugs.length) {
+            gBugInfo[aData.bugs[0].id] = aData.bugs[0];
+            beautifyBugzillaLink(aLink);
+          }
+          else if (aData && aData.error) {
+            // On error, create fake bug info.
+            gBugInfo[aLink.dataset["bugid"]] =
+              {status: "ERROR", resolution: "", summary: aData.message};
+            beautifyBugzillaLink(aLink);
+          }
+          else {
+            console.log("ERROR - couldn't find info for bug " + aLink.dataset["bugid"] + "!");
+          }
+        }.bind(undefined, link), // Prepend link to the argument list.
+        true // Accept 401 responses and still return them as JSON.
+      );
+    }
+  }
+}
+
+function beautifyBugzillaLink(aLink) {
+  if (gBugInfo[aLink.dataset["bugid"]]) {
+    aLink.dataset["status"] = gBugInfo[aLink.dataset["bugid"]].status;
+    aLink.dataset["resolution"] = gBugInfo[aLink.dataset["bugid"]].resolution;
+    aLink.title = gBugInfo[aLink.dataset["bugid"]].status + " " +
+                  gBugInfo[aLink.dataset["bugid"]].resolution + " - " +
+                  gBugInfo[aLink.dataset["bugid"]].summary;
+  }
+  else {
+    console.log("ERROR - info for bug " + aLink.dataset["bugid"] + " should exist but doesn't!");
   }
 }
 
@@ -188,7 +272,7 @@ function displayMessage(aErrorMessage) {
   return cell;
 }
 
-function fetchFile(aURL, aFormat, aCallback) {
+function fetchFile(aURL, aFormat, aCallback, aAccept401) {
   var XHR = new XMLHttpRequest();
   XHR.onreadystatechange = function() {
     if (XHR.readyState == 4) {/*
@@ -196,7 +280,7 @@ function fetchFile(aURL, aFormat, aCallback) {
           .appendChild(document.createTextNode(aURL + " - " + XHR.status +
                                                " " + XHR.statusText));*/
     }
-    if (XHR.readyState == 4 && XHR.status == 200) {
+    if (XHR.readyState == 4 && (XHR.status == 200 || (XHR.status == 401 && aAccept401))) {
       // so far so good
       if (XHR.responseXML != null && aFormat == "xml" &&
           XHR.responseXML.getElementById('test').firstChild.data)
