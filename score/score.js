@@ -75,6 +75,7 @@ function processData() {
               // last item, so all done with calculating
               buildDataTable();
               fetchBugs();
+              displayReasons();
             }
           });
         }
@@ -161,6 +162,25 @@ function buildDataTable() {
     cell.textContent = parseInt(gScores[signature].score);
     var cell = trow.appendChild(document.createElement("td"));
     cell.classList.add("reasons");
+    var span = cell.appendChild(document.createElement("span"));
+    span.textContent = "\u21ef"; // see https://en.wikipedia.org/wiki/Arrow_%28symbol%29#Arrows_in_Unicode
+    span.classList.add("startup");
+    cell.appendChild(document.createTextNode("\u00A0"));
+    var span = cell.appendChild(document.createElement("span"));
+    span.textContent = "H";
+    span.classList.add("shutdownhang");
+    cell.appendChild(document.createTextNode("\u00A0"));
+    var span = cell.appendChild(document.createElement("span"));
+    span.textContent = "GC";
+    span.classList.add("gc");
+    cell.appendChild(document.createTextNode("\u00A0"));
+    var span = cell.appendChild(document.createElement("span"));
+    span.textContent = "M";
+    span.classList.add("oom");
+    cell.appendChild(document.createTextNode("\u00A0"));
+    var span = cell.appendChild(document.createElement("span"));
+    span.textContent = "IN";
+    span.classList.add("installs");
   }
 }
 
@@ -216,10 +236,57 @@ function beautifyBugzillaLink(aLink) {
   }
 }
 
+function displayReasons() {
+  for (var signature in gScores) {
+    var sigRow = document.getElementById("sdata_" + encodeURIComponent(signature));
+    var reasons = sigRow.querySelector(".reasons");
+
+    var startupInd = reasons.querySelector(".startup");
+    startupInd.dataset["pct"] = parseInt(gScores[signature].startup_percent * 100);
+    startupInd.dataset["sextile"] = Math.floor(gScores[signature].startup_percent * 6);
+    startupInd.title = startupInd.dataset["pct"] + "% on startup (higher score)";
+
+    var sdhangInd = reasons.querySelector(".shutdownhang");
+    sdhangInd.dataset["pct"] = signature.startsWith("shutdownhang |") ? 100 : 0;
+    sdhangInd.dataset["sextile"] = signature.startsWith("shutdownhang |") ? 5 : 0;
+    sdhangInd.title = signature.startsWith("shutdownhang |") ? "is a shutdownhang (lower score)" : "not a shutdownhang";
+
+    var gcInd = reasons.querySelector(".gc");
+    gcInd.dataset["pct"] = parseInt(gScores[signature].is_gc_count / gScores[signature].count * 100);
+    gcInd.dataset["sextile"] = Math.floor(gcInd.dataset["pct"] * 6 / 100);
+    gcInd.title = gcInd.dataset["pct"] + "% are while performing GC (lower score)";
+
+    var oomInd = reasons.querySelector(".oom");
+    oomInd.dataset["pct"] = signature.startsWith("OOM |") ? 100 : 0;
+    oomInd.dataset["sextile"] = signature.startsWith("OOM |") ? 5 : 0;
+    oomInd.dataset["type"] = signature == "OOM | small" ? "small" :
+                                          (signature.startsWith("OOM | large") ? "large" : "unknown");
+    oomInd.title = oomInd.dataset["type"] == "small" ? "is small-allocation (<256K) out-of-memory (lower score)" :
+                   (oomInd.dataset["type"] == "large" ? "is large-allocation (>256K) out-of-memory (higher score)" :
+                   (signature.startsWith("OOM |") ? "is unknown out-of-memory (score-neutral)" :
+                   "not a known out-of-memory crash signature"));
+
+    if (gScores[signature].installations_ratio && gScores[signature].installations_factor) {
+      var installsInd = reasons.querySelector(".installs");
+      installsInd.dataset["pct"] = parseInt(gScores[signature].installations_ratio * 100);
+      installsInd.dataset["sextile"] = Math.floor((gScores[signature].installations_factor - 1) * 6);
+      installsInd.title = (1 / gScores[signature].installations_ratio).toFixed(2) +
+                          " crashes per installation, score factor: " + gScores[signature].installations_factor.toFixed(2);
+    }
+    else {
+      installsInd.title = "No score factor for crashes per installation was calculated!";
+    }
+  }
+}
+
 function calcScore(aSignature, aCallback) {
   gScores[aSignature].score = gScores[aSignature].count;
   // Startup crashes: count each crash with factor 10
   gScores[aSignature].score *= 1 + gScores[aSignature].startup_percent * (10 - 1);
+  // shutdownhang: factor 1/2
+  if (aSignature.startsWith("shutdownhang |")) {
+    gScores[aSignature].score *= .5;
+  }
   // GC crashes: count each crash with factor 1/4
   gScores[aSignature].score *= 1 + (gScores[aSignature].is_gc_count * (.25 - 1)) / gScores[aSignature].count;
   // OOM | small: factor 1/10

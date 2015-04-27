@@ -58,6 +58,35 @@ th {
  opacity: 0.5;
 }
 
+.reasons > span,
+.reasons > span[data-sextile="0"],
+.reasons > span[data-sextile="1"] {
+  cursor: pointer;
+  opacity: 0.05;
+}
+
+.reasons > span[data-sextile="2"] {
+  opacity: 0.25;
+}
+
+.reasons > span[data-sextile="3"] {
+  opacity: 0.5;
+}
+
+.reasons > span[data-sextile="4"] {
+  opacity: 0.75;
+}
+
+.reasons > span[data-sextile="5"],
+.reasons > span[data-sextile="6"] {
+  opacity: 1;
+}
+
+.reasons > span:hover {
+  color: #FF8000;
+  opacity: 1;
+}
+
 #debugLog {
   display: none;
 }
