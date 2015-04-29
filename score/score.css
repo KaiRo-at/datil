@@ -87,6 +87,10 @@ th {
   opacity: 1;
 }
 
+.startup[data-pct="100"]:not(:hover) {
+  color: #FF0000;
+}
+
 #debugLog {
   display: none;
 }
