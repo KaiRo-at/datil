@@ -61,13 +61,14 @@ window.onload = function() {
 
 function processData() {
   var tblBody = document.getElementById("scoreTBody");
+  var fetchLimit = Math.round(gLimit * 1.5);
   fetchFile(gSocorroPath + "api/TCBS/?product=" + gProduct + "&version=" + gVersion +
             "&crash_type=" + gProcess + "&date_range_type=" + gDuration +
-            "&end_date=" + gDate + "&limit=" + gLimit, "json",
+            "&end_date=" + gDate + "&limit=" + fetchLimit, "json",
     function(aData) {
       if (aData) {
         var resultCount = aData.crashes.length;
-        displayMessage("Processing " + resultCount + " results…");
+        displayMessage("Processing " + resultCount + " results (showing max. " + gLimit + ")…");
         for (var i = 0; i <= resultCount - 1; i++) {
           gScores[aData.crashes[i].signature] = aData.crashes[i];
           calcScore(aData.crashes[i].signature, function(aSignature) {
@@ -90,22 +91,30 @@ function processData() {
 function fetchBugs() {
   for (var signature in gScores) {
     gScores[signature].bugs = [];
-    fetchFile(gSocorroPath + "api/Bugs/?signatures=" + encodeURIComponent(signature), "json",
-      function(aSignature, aData) {
-        if (aData) {
-          for (var i = 0; i <= aData.hits.length - 1; i++) {
-            if (aData.hits[i].signature == aSignature) {
-              gScores[aSignature].bugs.push(aData.hits[i].id);
-            }
-          }
-          buildBugsField(aSignature);
-        }
-        else {
-          console.log("ERROR - couldn't find bug data for " + aSignature + "!");
-        }
-      }.bind(undefined, signature) // Prepend signature to the argument list.
-    );
+    if (document.getElementById("sdata_" + encodeURIComponent(signature))) {
+      // Only actually fetch if this is actually shown.
+      fetchBugsForSignature(signature);
+    }
   }
+}
+
+function fetchBugsForSignature(aSignature) {
+  gScores[aSignature].bugs = [];
+  fetchFile(gSocorroPath + "api/Bugs/?signatures=" + encodeURIComponent(aSignature), "json",
+    function(aSignature, aData) {
+      if (aData) {
+        for (var i = 0; i <= aData.hits.length - 1; i++) {
+          if (aData.hits[i].signature == aSignature) {
+            gScores[aSignature].bugs.push(aData.hits[i].id);
+          }
+        }
+        buildBugsField(aSignature);
+      }
+      else {
+        console.log("ERROR - couldn't find bug data for " + aSignature + "!");
+      }
+    }.bind(undefined, aSignature) // Prepend signature to the argument list.
+  );
 }
 
 function buildDataTable() {
@@ -134,7 +143,8 @@ function buildDataTable() {
   var sigSorted = Object.keys(gScores).sort(
     function (a, b) { return gScores[b].score - gScores[a].score; }
   );
-  for (var i = 0; i <= sigSorted.length - 1; i++) {
+  var listNum = Math.min(gLimit, sigSorted.length);
+  for (var i = 0; i <= listNum - 1; i++) {
     signature = sigSorted[i];
     var trow = tblBody.appendChild(document.createElement("tr"));
     trow.setAttribute("id", "sdata_" + encodeURIComponent(signature));
@@ -239,42 +249,45 @@ function beautifyBugzillaLink(aLink) {
 function displayReasons() {
   for (var signature in gScores) {
     var sigRow = document.getElementById("sdata_" + encodeURIComponent(signature));
-    var reasons = sigRow.querySelector(".reasons");
+    if (sigRow) {
+      // Only add information to actually existing rows.
+      var reasons = sigRow.querySelector(".reasons");
 
-    var startupInd = reasons.querySelector(".startup");
-    startupInd.dataset["pct"] = parseInt(gScores[signature].startup_percent * 100);
-    startupInd.dataset["sextile"] = Math.floor(gScores[signature].startup_percent * 6);
-    startupInd.title = startupInd.dataset["pct"] + "% on startup (higher score)";
+      var startupInd = reasons.querySelector(".startup");
+      startupInd.dataset["pct"] = parseInt(gScores[signature].startup_percent * 100);
+      startupInd.dataset["sextile"] = Math.floor(gScores[signature].startup_percent * 6);
+      startupInd.title = startupInd.dataset["pct"] + "% on startup (higher score)";
 
-    var sdhangInd = reasons.querySelector(".shutdownhang");
-    sdhangInd.dataset["pct"] = signature.startsWith("shutdownhang |") ? 100 : 0;
-    sdhangInd.dataset["sextile"] = signature.startsWith("shutdownhang |") ? 5 : 0;
-    sdhangInd.title = signature.startsWith("shutdownhang |") ? "is a shutdownhang (lower score)" : "not a shutdownhang";
+      var sdhangInd = reasons.querySelector(".shutdownhang");
+      sdhangInd.dataset["pct"] = signature.startsWith("shutdownhang |") ? 100 : 0;
+      sdhangInd.dataset["sextile"] = signature.startsWith("shutdownhang |") ? 5 : 0;
+      sdhangInd.title = signature.startsWith("shutdownhang |") ? "is a shutdownhang (lower score)" : "not a shutdownhang";
 
-    var gcInd = reasons.querySelector(".gc");
-    gcInd.dataset["pct"] = parseInt(gScores[signature].is_gc_count / gScores[signature].count * 100);
-    gcInd.dataset["sextile"] = Math.floor(gcInd.dataset["pct"] * 6 / 100);
-    gcInd.title = gcInd.dataset["pct"] + "% are while performing GC (lower score)";
+      var gcInd = reasons.querySelector(".gc");
+      gcInd.dataset["pct"] = parseInt(gScores[signature].is_gc_count / gScores[signature].count * 100);
+      gcInd.dataset["sextile"] = Math.floor(gcInd.dataset["pct"] * 6 / 100);
+      gcInd.title = gcInd.dataset["pct"] + "% are while performing GC (lower score)";
 
-    var oomInd = reasons.querySelector(".oom");
-    oomInd.dataset["pct"] = signature.startsWith("OOM |") ? 100 : 0;
-    oomInd.dataset["sextile"] = signature.startsWith("OOM |") ? 5 : 0;
-    oomInd.dataset["type"] = signature == "OOM | small" ? "small" :
-                                          (signature.startsWith("OOM | large") ? "large" : "unknown");
-    oomInd.title = oomInd.dataset["type"] == "small" ? "is small-allocation (<256K) out-of-memory (lower score)" :
-                   (oomInd.dataset["type"] == "large" ? "is large-allocation (>256K) out-of-memory (higher score)" :
-                   (signature.startsWith("OOM |") ? "is unknown out-of-memory (score-neutral)" :
-                   "not a known out-of-memory crash signature"));
+      var oomInd = reasons.querySelector(".oom");
+      oomInd.dataset["pct"] = signature.startsWith("OOM |") ? 100 : 0;
+      oomInd.dataset["sextile"] = signature.startsWith("OOM |") ? 5 : 0;
+      oomInd.dataset["type"] = signature == "OOM | small" ? "small" :
+                                            (signature.startsWith("OOM | large") ? "large" : "unknown");
+      oomInd.title = oomInd.dataset["type"] == "small" ? "is small-allocation (<256K) out-of-memory (lower score)" :
+                    (oomInd.dataset["type"] == "large" ? "is large-allocation (>256K) out-of-memory (higher score)" :
+                    (signature.startsWith("OOM |") ? "is unknown out-of-memory (score-neutral)" :
+                    "not a known out-of-memory crash signature"));
 
-    if (gScores[signature].installations_ratio && gScores[signature].installations_factor) {
-      var installsInd = reasons.querySelector(".installs");
-      installsInd.dataset["pct"] = parseInt(gScores[signature].installations_ratio * 100);
-      installsInd.dataset["sextile"] = Math.floor((gScores[signature].installations_factor - 1) * 6);
-      installsInd.title = (1 / gScores[signature].installations_ratio).toFixed(2) +
-                          " crashes per installation, score factor: " + gScores[signature].installations_factor.toFixed(2);
-    }
-    else {
-      installsInd.title = "No score factor for crashes per installation was calculated!";
+      if (gScores[signature].installations_ratio && gScores[signature].installations_factor) {
+        var installsInd = reasons.querySelector(".installs");
+        installsInd.dataset["pct"] = parseInt(gScores[signature].installations_ratio * 100);
+        installsInd.dataset["sextile"] = Math.floor((gScores[signature].installations_factor - 1) * 6);
+        installsInd.title = (1 / gScores[signature].installations_ratio).toFixed(2) +
+                            " crashes per installation, score factor: " + gScores[signature].installations_factor.toFixed(2);
+      }
+      else {
+        installsInd.title = "No score factor for crashes per installation was calculated!";
+      }
     }
   }
 }
