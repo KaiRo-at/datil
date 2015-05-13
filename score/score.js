@@ -320,20 +320,25 @@ function calcScore(aSignature, aCallback) {
             "&report_types=" + sigRepTypes +
             "&start_date=" + makeDate(startDate) + "&end_date=" + gDate, "json",
     function(aData) {
-      if (aData) {
-        gScores[aSignature].installations = aData.reports.distinct_install[0].installations;
-        // installations: factor 0 for <3 installs
-        if (aData.reports.distinct_install[0].installations < 3) {
-          gScores[aSignature].score *= 0;
+      if (aData && aData.reports) {
+        if (aData.reports.distinct_install && aData.reports.distinct_install.length) {
+          gScores[aSignature].installations = aData.reports.distinct_install[0].installations;
+          // installations: factor 0 for <3 installs
+          if (aData.reports.distinct_install[0].installations < 3) {
+            gScores[aSignature].score *= 0;
+          }
+          // installations: factor up to 2 for few people crashing over and over,
+          //                factor 1 for installations == crashes
+          // 1+e^(x*-3)*sin(x*pi)*3 - prototyped via http://www.mathe-fa.de/en
+          var instRatio = aData.reports.distinct_install[0].installations /
+                          aData.reports.distinct_install[0].crashes;
+          gScores[aSignature].score *= 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+          gScores[aSignature].installations_factor = 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+          gScores[aSignature].installations_ratio = instRatio;
         }
-        // installations: factor up to 2 for few people crashing over and over,
-        //                factor 1 for installations == crashes
-        // 1+e^(x*-3)*sin(x*pi)*3 - prototyped via http://www.mathe-fa.de/en
-        var instRatio = aData.reports.distinct_install[0].installations /
-                        aData.reports.distinct_install[0].crashes;
-        gScores[aSignature].score *= 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
-        gScores[aSignature].installations_factor = 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
-        gScores[aSignature].installations_ratio = instRatio;
+        else {
+          console.log("ERROR - no installation count present for " + aSignature + "!");
+        }
       }
       else {
         console.log("ERROR - couldn't find Signature Summary data for " + aSignature + "!");
