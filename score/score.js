@@ -278,8 +278,8 @@ function displayReasons() {
                     (signature.startsWith("OOM |") ? "is unknown out-of-memory (score-neutral)" :
                     "not a known out-of-memory crash signature"));
 
+      var installsInd = reasons.querySelector(".installs");
       if (gScores[signature].installations_ratio && gScores[signature].installations_factor) {
-        var installsInd = reasons.querySelector(".installs");
         installsInd.dataset["pct"] = parseInt(gScores[signature].installations_ratio * 100);
         installsInd.dataset["sextile"] = Math.floor((gScores[signature].installations_factor - 1) * 6);
         installsInd.title = (1 / gScores[signature].installations_ratio).toFixed(2) +
