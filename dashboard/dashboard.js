@@ -581,7 +581,7 @@ function majVer(aVersion) {
 
 function repVer(aVersion) {
   // returns a report version, e.g. 11.0 for 11.0b3, 13.0a1 for 13.0a1, 10.0 for 10.0.2, 38.0.5 for 38.0.5b99
-  return /\d+b\d+$/.test(aVersion) ? aVersion.match(/^\d+(\.\d+)+/) : aVersion.match(/^\d+\.[\da]+/);
+  return /\d+b\d*$/.test(aVersion) ? aVersion.match(/^\d+(:?\.\d+)+/) : aVersion.match(/^\d+\.[\da]+/);
 }
 
 function intVer(aVersion) {
