@@ -4,8 +4,9 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox, gDataIssueDays,
-    gRawData, gUseADI = true, gADIGraph = false;
+var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox,
+    gCombineBrowserCheckbox, gDataIssueDays, gRawData,
+    gUseADI = true, gCombineBrowser = true; gADIGraph = false;
 
 var gDataPath = "../../";
 // for local debugging
@@ -17,6 +18,7 @@ var gBranches = {
     datafile: "Firefox-release-bytype.json",
     annotationfile: "Firefox-release-annotations.json",
     plugins: true,
+    content: false,
     sumContent: true,
     maxRate: 3,
     maxCrashes: 2.2e6,
@@ -27,6 +29,7 @@ var gBranches = {
     datafile: "Firefox-beta-bytype.json",
     annotationfile: "Firefox-beta-annotations.json",
     plugins: true,
+    content: false,
     sumContent: true,
     maxRate: 3,
     maxCrashes: 80e3,
@@ -37,6 +40,7 @@ var gBranches = {
     datafile: "Firefox-aurora-bytype.json",
     annotationfile: "Firefox-aurora-annotations.json",
     plugins: true,
+    content: true,
     sumContent: true,
     maxRate: 10,
     maxCrashes: 5e3,
@@ -47,6 +51,7 @@ var gBranches = {
     datafile: "Firefox-nightly-bytype.json",
     annotationfile: "Firefox-nightly-annotations.json",
     plugins: true,
+    content: true,
     sumContent: true,
     maxRate: 15,
     maxCrashes: 15e3,
@@ -57,6 +62,7 @@ var gBranches = {
     datafile: "FennecAndroid-release-bytype.json",
     annotationfile: "FennecAndroid-release-annotations.json",
     plugins: false,
+    content: false,
     sumContent: false,
     maxRate: 4,
     maxCrashes: 100e3,
@@ -67,6 +73,7 @@ var gBranches = {
     datafile: "FennecAndroid-beta-bytype.json",
     annotationfile: "FennecAndroid-beta-annotations.json",
     plugins: false,
+    content: false,
     sumContent: false,
     maxRate: 11,
     maxCrashes: 1e3,
@@ -77,6 +84,7 @@ var gBranches = {
     datafile: "FennecAndroid-aurora-bytype.json",
     annotationfile: "FennecAndroid-aurora-annotations.json",
     plugins: false,
+    content: false,
     sumContent: false,
     maxRate: 25,
     maxCrashes: 1e3,
@@ -87,6 +95,7 @@ var gBranches = {
     datafile: "FennecAndroid-nightly-bytype.json",
     annotationfile: "FennecAndroid-nightly-annotations.json",
     plugins: false,
+    content: false,
     sumContent: false,
     maxRate: 50,
     maxCrashes: 1e3,
@@ -112,6 +121,12 @@ window.onload = function() {
   gADICheckbox.checked = gUseADI;
   gADICheckbox.onchange = function(aCheckbox) {
     gUseADI = gADICheckbox.checked;
+    graphData(gRawData);
+  }
+  gCombineBrowserCheckbox = document.getElementById("combineBrowserCheckbox");
+  gCombineBrowserCheckbox.checked = gCombineBrowser;
+  gCombineBrowserCheckbox.onchange = function(aCheckbox) {
+    gCombineBrowser = gCombineBrowserCheckbox.checked;
     graphData(gRawData);
   }
 
@@ -154,9 +169,13 @@ window.onload = function() {
 }
 
 window.onresize = function() {
+  if (!gGraph) {
+    console.log("Tried resizing but found no graph.");
+    return;
+  }
   gGraph.resize(
     gBody.clientWidth,
-    gBody.clientHeight - graphDiv.offsetTop
+    gBody.clientHeight - document.getElementById("graphdiv").offsetTop
   );
 }
 
@@ -184,14 +203,16 @@ function graphData(aData) {
         dataArray.push(aData[day].adi / crUnitNum);
       }
       else {
-        if (gBranches[gSelID].sumContent) {
-          browserCrashes = 0;
-          if (aData[day].crashes["Browser"]) { browserCrashes += aData[day].crashes["Browser"]; }
+        if (gBranches[gSelID].sumContent && gCombineBrowser) {
+          browserCrashes = aData[day].crashes["Browser"];
           if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
           dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          if (gBranches[gSelID].content) {
+            dataArray.push(aData[day].crashes["Content"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          }
         }
         if (gBranches[gSelID].plugins) {
           dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
@@ -206,11 +227,15 @@ function graphData(aData) {
       labels.push("ADI");
     }
     else {
-      if (gBranches[gSelID].sumContent) {
+      if (gBranches[gSelID].sumContent && gCombineBrowser) {
         labels.push("browser+content crashes");
       }
       else {
         labels.push("browser crashes");
+        if (gBranches[gSelID].content) {
+          labels.push("content crashes");
+          colors.push("#80CCFF");
+        }
       }
       if (gBranches[gSelID].plugins) {
         labels.push("plugin crashes");
@@ -259,13 +284,18 @@ function graphData(aData) {
       fetchFile(gDataPath + gBranches[gSelID].annotationfile, "json",
         function(aData) {
           if (aData) {
-            // Convert dates to Date objects so they can be displayed.
             for (var i = 0; i < aData.length; i++) {
+              // Convert dates to Date objects so they can be displayed.
               aData[i].x = Date.parse(aData[i].x);
+              // Adjust series to attach when we display non-default graphs.
               if (gADIGraph &&
                   (aData[i].series == "browser+content crashes" ||
                    aData[i].series == "browser crashes")) {
                 aData[i].series = "ADI";
+              }
+              if (gBranches[gSelID].sumContent && !gCombineBrowser &&
+                  (aData[i].series == "browser+content crashes")) {
+                aData[i].series = "browser crashes";
               }
             }
             if (gDataIssueDays) {
@@ -287,7 +317,7 @@ function graphData(aData) {
           }
         }
       );
-      console.log("foo");
+      console.log("Graph created.");
     });
   }
   else {
