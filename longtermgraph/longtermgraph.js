@@ -183,6 +183,7 @@ function graphData(aData) {
   var graphDiv = document.getElementById("graphdiv");
   gRawData = aData;
   if (aData) {
+    gCombineBrowserCheckbox.disabled = gADIGraph || !gBranches[gSelID].content;
     var graphData = [], dataArray, browserCrashes;
     if (gADIGraph) {
       var crUnit = (gBranches[gSelID].maxADI > 1e6) ? "M" : "k";

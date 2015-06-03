@@ -29,6 +29,10 @@ body {
   margin: 0;
 }
 
+input[type="checkbox"]:disabled + label {
+  color: #808080;
+}
+
 h1 {
   margin-top: 0; /* Makes sure the body height calculation works */
   text-align: center;
