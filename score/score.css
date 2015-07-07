@@ -50,11 +50,13 @@ th {
   font-size: small;
 }
 
-.bugs > a[data-status="RESOLVED"] {
+.bugs > a[data-status="RESOLVED"],
+.bugs > a[data-status="VERIFIED"] {
   text-decoration: line-through;
 }
 
-.bugs > a[data-status="RESOLVED"]:not([data-resolution="FIXED"]):not(:hover) {
+.bugs > a[data-status="RESOLVED"]:not([data-resolution="FIXED"]):not(:hover),
+.bugs > a[data-status="VERIFIED"]:not([data-resolution="FIXED"]):not(:hover) {
  opacity: 0.5;
 }
 
