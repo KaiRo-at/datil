@@ -84,6 +84,14 @@ th {
   opacity: 1;
 }
 
+.reasons > .increase {
+  color: #C00000;
+}
+
+.reasons > .decrease {
+  color: #8080FF;
+}
+
 .reasons > span:hover {
   color: #FF8000;
   opacity: 1;

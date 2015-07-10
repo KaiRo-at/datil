@@ -254,16 +254,19 @@ function displayReasons() {
       var reasons = sigRow.querySelector(".reasons");
 
       var startupInd = reasons.querySelector(".startup");
+      startupInd.classList.add("increase");
       startupInd.dataset["pct"] = parseInt(gScores[signature].startup_percent * 100);
       startupInd.dataset["sextile"] = Math.floor(gScores[signature].startup_percent * 6);
       startupInd.title = startupInd.dataset["pct"] + "% on startup (higher score)";
 
       var sdhangInd = reasons.querySelector(".shutdownhang");
+      sdhangInd.classList.add("decrease");
       sdhangInd.dataset["pct"] = signature.startsWith("shutdownhang |") ? 100 : 0;
       sdhangInd.dataset["sextile"] = signature.startsWith("shutdownhang |") ? 5 : 0;
       sdhangInd.title = signature.startsWith("shutdownhang |") ? "is a shutdownhang (lower score)" : "not a shutdownhang";
 
       var gcInd = reasons.querySelector(".gc");
+      gcInd.classList.add("decrease");
       gcInd.dataset["pct"] = parseInt(gScores[signature].is_gc_count / gScores[signature].count * 100);
       gcInd.dataset["sextile"] = Math.floor(gcInd.dataset["pct"] * 6 / 100);
       gcInd.title = gcInd.dataset["pct"] + "% are while performing GC (lower score)";
@@ -273,12 +276,15 @@ function displayReasons() {
       oomInd.dataset["sextile"] = signature.startsWith("OOM |") ? 5 : 0;
       oomInd.dataset["type"] = signature == "OOM | small" ? "small" :
                                             (signature.startsWith("OOM | large") ? "large" : "unknown");
+      oomInd.classList.add(signature == "OOM | small" ? "decrease" :
+                                        (signature.startsWith("OOM | large") ? "increase" : "neutral"));
       oomInd.title = oomInd.dataset["type"] == "small" ? "is small-allocation (<256K) out-of-memory (lower score)" :
                     (oomInd.dataset["type"] == "large" ? "is large-allocation (>256K) out-of-memory (higher score)" :
                     (signature.startsWith("OOM |") ? "is unknown out-of-memory (score-neutral)" :
                     "not a known out-of-memory crash signature"));
 
       var installsInd = reasons.querySelector(".installs");
+      installsInd.classList.add("increase");
       if (gScores[signature].installations_ratio && gScores[signature].installations_factor) {
         installsInd.dataset["pct"] = parseInt(gScores[signature].installations_ratio * 100);
         installsInd.dataset["sextile"] = Math.floor((gScores[signature].installations_factor - 1) * 6);
