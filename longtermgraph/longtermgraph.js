@@ -6,7 +6,8 @@
 
 var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox,
     gCombineBrowserCheckbox, gDataIssueDays, gRawData,
-    gUseADI = true, gCombineBrowser = true; gADIGraph = false;
+    gUseADI = true, gCombineBrowser = true, gADIGraph = false,
+    gCategoryGraph = false, gCategoryProcess = "browser", gCatData;
 
 var gDataPath = "../../";
 // for local debugging
@@ -17,6 +18,7 @@ var gBranches = {
     title: "Firefox release channel",
     datafile: "Firefox-release-bytype.json",
     annotationfile: "Firefox-release-annotations.json",
+    countsfile: "Firefox-release-counts.json",
     plugins: true,
     content: false,
     sumContent: true,
@@ -28,6 +30,7 @@ var gBranches = {
     title: "Firefox beta channel",
     datafile: "Firefox-beta-bytype.json",
     annotationfile: "Firefox-beta-annotations.json",
+    countsfile: "Firefox-beta-counts.json",
     plugins: true,
     content: false,
     sumContent: true,
@@ -39,6 +42,7 @@ var gBranches = {
     title: "Firefox Aurora / DevEdition channel",
     datafile: "Firefox-aurora-bytype.json",
     annotationfile: "Firefox-aurora-annotations.json",
+    countsfile: "Firefox-aurora-counts.json",
     plugins: true,
     content: true,
     sumContent: true,
@@ -50,6 +54,7 @@ var gBranches = {
     title: "Firefox Nightly channel",
     datafile: "Firefox-nightly-bytype.json",
     annotationfile: "Firefox-nightly-annotations.json",
+    countsfile: "Firefox-nightly-counts.json",
     plugins: true,
     content: true,
     sumContent: true,
@@ -61,6 +66,7 @@ var gBranches = {
     title: "Firefox for Android release channel",
     datafile: "FennecAndroid-release-bytype.json",
     annotationfile: "FennecAndroid-release-annotations.json",
+    countsfile: "FennecAndroid-release-counts.json",
     plugins: false,
     content: false,
     sumContent: false,
@@ -72,6 +78,7 @@ var gBranches = {
     title: "Firefox for Android beta channel",
     datafile: "FennecAndroid-beta-bytype.json",
     annotationfile: "FennecAndroid-beta-annotations.json",
+    countsfile: "FennecAndroid-beta-counts.json",
     plugins: false,
     content: false,
     sumContent: false,
@@ -83,6 +90,7 @@ var gBranches = {
     title: "Firefox for Android Aurora channel",
     datafile: "FennecAndroid-aurora-bytype.json",
     annotationfile: "FennecAndroid-aurora-annotations.json",
+    countsfile: "FennecAndroid-aurora-counts.json",
     plugins: false,
     content: false,
     sumContent: false,
@@ -94,6 +102,7 @@ var gBranches = {
     title: "Firefox for Android Nightly channel",
     datafile: "FennecAndroid-nightly-bytype.json",
     annotationfile: "FennecAndroid-nightly-annotations.json",
+    countsfile: "FennecAndroid-nightly-counts.json",
     plugins: false,
     content: false,
     sumContent: false,
@@ -141,6 +150,12 @@ window.onload = function() {
         document.title = "ADI History";
         document.getElementById("selectorsubline").hidden = true;
       }
+      else if (urlAParts[1] == "bcat") {
+        gCategoryGraph = true;
+        gCategoryProcess = "browser";
+        document.getElementsByTagName("h1")[0].textContent += " - Categories";
+        document.title += " - Categories";
+      }
       urlAnchor = urlAParts[0];
     }
     if (urlAnchor in gBranches) {
@@ -164,6 +179,18 @@ window.onload = function() {
       }
     }
   );
+  if (gCategoryGraph) {
+    fetchFile(gDataPath + gBranches[gSelID].countsfile, "json",
+      function(aData) {
+        if (aData) {
+          gCatData = aData;
+        }
+        else {
+          console.log("Error loading category counts.");
+        }
+      }
+    );
+  }
 
   fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
 }
