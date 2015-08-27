@@ -153,8 +153,8 @@ window.onload = function() {
       else if (urlAParts[1] == "bcat") {
         gCategoryGraph = true;
         gCategoryProcess = "browser";
-        document.getElementsByTagName("h1")[0].textContent += " - Categories";
-        document.title += " - Categories";
+        document.getElementsByTagName("h1")[0].textContent += " - Categories (browser process)";
+        document.title += " - Categories (browser)";
       }
       urlAnchor = urlAParts[0];
     }
@@ -184,6 +184,8 @@ window.onload = function() {
       function(aData) {
         if (aData) {
           gCatData = aData;
+          // Call this from here so we make sure all data is loaded.
+          fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
         }
         else {
           console.log("Error loading category counts.");
@@ -191,8 +193,9 @@ window.onload = function() {
       }
     );
   }
-
-  fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
+  else {
+    fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
+  }
 }
 
 window.onresize = function() {
@@ -228,6 +231,12 @@ function graphData(aData) {
     if (gCategoryGraph) {
       for (var day in gCatData) {
         dataArray = [ new Date(day) ];
+        if (aData[day].crashes["Browser"]) {
+          dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(0);
+        }
         if (gCatData[day].startup && gCatData[day].startup[gCategoryProcess]) {
           dataArray.push(gCatData[day].startup[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
@@ -236,6 +245,30 @@ function graphData(aData) {
         }
         if (gCatData[day].oom && gCatData[day].oom[gCategoryProcess]) {
           dataArray.push(gCatData[day].oom[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(0);
+        }
+        if (gCatData[day]["oom:small"] && gCatData[day]["oom:small"][gCategoryProcess]) {
+          dataArray.push(gCatData[day]["oom:small"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(0);
+        }
+        if (gCatData[day]["oom:large"] && gCatData[day]["oom:large"][gCategoryProcess]) {
+          dataArray.push(gCatData[day]["oom:large"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(0);
+        }
+        if (gCatData[day]["address:pure"] && gCatData[day]["address:pure"][gCategoryProcess]) {
+          dataArray.push(gCatData[day]["address:pure"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        }
+        else {
+          dataArray.push(0);
+        }
+        if (gCatData[day]["address:file"] && gCatData[day]["address:file"][gCategoryProcess]) {
+          dataArray.push(gCatData[day]["address:file"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
@@ -278,10 +311,20 @@ function graphData(aData) {
 
     var colors = [], labels = ["date"];
     if (gCategoryGraph) {
+      labels.push("total");
+      colors.push("#CCCCCC");
       labels.push("startup");
-      colors.push("#FF8000");
+      colors.push("#FF0000");
       labels.push("OOM");
       colors.push("#004080");
+      labels.push("OOM:small");
+      colors.push("#80CCFF");
+      labels.push("OOM:large");
+      colors.push("#80FFCC");
+      labels.push("addr:pure");
+      colors.push("#FFCC00");
+      labels.push("addr:file");
+      colors.push("#FF8000");
       labels.push("shutdownhang");
       colors.push("#808080");
     }
@@ -352,6 +395,11 @@ function graphData(aData) {
               // Convert dates to Date objects so they can be displayed.
               aData[i].x = Date.parse(aData[i].x);
               // Adjust series to attach when we display non-default graphs.
+              if (gCategoryGraph &&
+                  (aData[i].series == "browser+content crashes" ||
+                   aData[i].series == "browser crashes")) {
+                aData[i].series = "total";
+              }
               if (gADIGraph &&
                   (aData[i].series == "browser+content crashes" ||
                    aData[i].series == "browser crashes")) {
