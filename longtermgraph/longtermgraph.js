@@ -117,7 +117,7 @@ window.onload = function() {
   gBody = document.getElementsByTagName("body")[0];
   gBranchSelect = document.getElementById("branch");
   gBranchSelect.onchange = function() {
-    location.href = "?" + gBranchSelect.value + (gADIGraph ? "-adi" : "");
+    location.href = "?" + gBranchSelect.value + (gADIGraph ? "-adi" : (gCategoryGraph ? "-bcat" : ""));
   }
   var option;
   for (var branchID in gBranches) {
@@ -225,36 +225,72 @@ function graphData(aData) {
       var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
     }
     // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
-    for (var day in aData) {
-      dataArray = [ new Date(day) ];
-      if (gADIGraph) {
-        dataArray.push(aData[day].adi / crUnitNum);
-      }
-      else {
-        if (gBranches[gSelID].sumContent && gCombineBrowser) {
-          browserCrashes = aData[day].crashes["Browser"];
-          if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
-          dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+    if (gCategoryGraph) {
+      for (var day in gCatData) {
+        dataArray = [ new Date(day) ];
+        if (gCatData[day].startup && gCatData[day].startup[gCategoryProcess]) {
+          dataArray.push(gCatData[day].startup[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
-          dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-          if (gBranches[gSelID].content) {
-            dataArray.push(aData[day].crashes["Content"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-          }
+          dataArray.push(0);
         }
-        if (gBranches[gSelID].plugins) {
-          dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-          dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        if (gCatData[day].oom && gCatData[day].oom[gCategoryProcess]) {
+          dataArray.push(gCatData[day].oom[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
+        else {
+          dataArray.push(0);
+        }
+        if (gCatData[day].shutdownhang) {
+          dataArray.push(gCatData[day].shutdownhang * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+         }
+        else {
+          dataArray.push(0);
+        }
+       graphData.push(dataArray);
       }
-      graphData.push(dataArray);
-    }
-
-    var colors = ["#004080"], labels = ["date"];
-    if (gADIGraph) {
-      labels.push("ADI");
     }
     else {
+      for (var day in aData) {
+        dataArray = [ new Date(day) ];
+        if (gADIGraph) {
+          dataArray.push(aData[day].adi / crUnitNum);
+        }
+        else {
+          if (gBranches[gSelID].sumContent && gCombineBrowser) {
+            browserCrashes = aData[day].crashes["Browser"];
+            if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
+            dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          }
+          else {
+            dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+            if (gBranches[gSelID].content) {
+              dataArray.push(aData[day].crashes["Content"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+            }
+          }
+          if (gBranches[gSelID].plugins) {
+            dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+            dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          }
+        }
+        graphData.push(dataArray);
+      }
+    }
+
+    var colors = [], labels = ["date"];
+    if (gCategoryGraph) {
+      labels.push("startup");
+      colors.push("#FF8000");
+      labels.push("OOM");
+      colors.push("#004080");
+      labels.push("shutdownhang");
+      colors.push("#808080");
+    }
+    else if (gADIGraph) {
+      labels.push("ADI");
+      colors.push("#004080");
+    }
+    else {
+      colors.push("#004080");
       if (gBranches[gSelID].sumContent && gCombineBrowser) {
         labels.push("browser+content crashes");
       }
