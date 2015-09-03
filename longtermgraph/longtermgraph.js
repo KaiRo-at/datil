@@ -180,6 +180,7 @@ window.onload = function() {
     }
   );
   if (gCategoryGraph) {
+    document.getElementById("combineoption").hidden = true;
     fetchFile(gDataPath + gBranches[gSelID].countsfile, "json",
       function(aData) {
         if (aData) {
@@ -189,6 +190,8 @@ window.onload = function() {
         }
         else {
           console.log("Error loading category counts.");
+          // ERROR! We're screwed!
+          document.getElementById("graphdiv").textContent = "Error loading JSON data.";
         }
       }
     );
@@ -311,21 +314,21 @@ function graphData(aData) {
 
     var colors = [], labels = ["date"];
     if (gCategoryGraph) {
-      labels.push("total");
+      labels.push("total (reference)");
       colors.push("#CCCCCC");
-      labels.push("startup");
+      labels.push("startup (<60s uptime)");
       colors.push("#FF0000");
-      labels.push("OOM");
+      labels.push("OOM (total)");
       colors.push("#004080");
-      labels.push("OOM:small");
+      labels.push("OOM:small (<256K)");
       colors.push("#80CCFF");
-      labels.push("OOM:large");
+      labels.push("OOM:large (>256K)");
       colors.push("#80FFCC");
-      labels.push("addr:pure");
+      labels.push("pure address (@0x...)");
       colors.push("#FFCC00");
-      labels.push("addr:file");
+      labels.push("unsymbolized: file@0x...");
       colors.push("#FF8000");
-      labels.push("shutdownhang");
+      labels.push("shutdownhang (>1min)");
       colors.push("#808080");
     }
     else if (gADIGraph) {
