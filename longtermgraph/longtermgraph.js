@@ -4,8 +4,9 @@
 
 // See http://dygraphs.com/ for graphs documentation.
 
-var gBody, gGraph, gSelID, gBranchSelect, gADICheckbox,
-    gCombineBrowserCheckbox, gDataIssueDays, gRawData,
+var gBody, gGraph, gSelID,
+    gBranchSelect, gADICheckbox, gCombineBrowserCheckbox,
+    gDataIssueDays, gRawData, gMinDay, gType,
     gUseADI = true, gCombineBrowser = true, gADIGraph = false,
     gCategoryGraph = false, gCategoryProcess = "browser", gCatData;
 
@@ -23,6 +24,7 @@ var gBranches = {
     content: false,
     sumContent: true,
     maxRate: 3,
+    maxRate_office: 1.5,
     maxCrashes: 2.2e6,
     maxADI: 130e6,
   },
@@ -34,7 +36,7 @@ var gBranches = {
     plugins: true,
     content: false,
     sumContent: true,
-    maxRate: 3,
+    maxRate: 4,
     maxCrashes: 80e3,
     maxADI: 3.5e6,
   },
@@ -58,7 +60,7 @@ var gBranches = {
     plugins: true,
     content: true,
     sumContent: true,
-    maxRate: 15,
+    maxRate: 30,
     maxCrashes: 15e3,
     maxADI: 140e3,
   },
@@ -71,6 +73,7 @@ var gBranches = {
     content: false,
     sumContent: false,
     maxRate: 4,
+    maxRate_office: 2.5,
     maxCrashes: 100e3,
     maxADI: 5e6,
   },
@@ -83,6 +86,7 @@ var gBranches = {
     content: false,
     sumContent: false,
     maxRate: 11,
+    maxRate_office: 5,
     maxCrashes: 1e3,
     maxADI: 120e3,
   },
@@ -107,6 +111,7 @@ var gBranches = {
     content: false,
     sumContent: false,
     maxRate: 50,
+    maxRate_office: 30,
     maxCrashes: 1e3,
     maxADI: 6e3,
   },
@@ -157,18 +162,21 @@ window.onload = function() {
         gCategoryProcess = "browser";
         document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
         document.title += " - Categories (" + gCategoryProcess + ")";
+        gType = gCategoryProcess;
       }
       else if (urlAParts[1] == "ccat") {
         gCategoryGraph = true;
         gCategoryProcess = "content";
         document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
         document.title += " - Categories (" + gCategoryProcess + ")";
+        gType = gCategoryProcess;
       }
       else if (urlAParts[1] == "pcat") {
         gCategoryGraph = true;
         gCategoryProcess = "plugin";
         document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
         document.title += " - Categories (" + gCategoryProcess + ")";
+        gType = gCategoryProcess;
       }
       urlAnchor = urlAParts[0];
     }
@@ -180,6 +188,14 @@ window.onload = function() {
       var branchnames = Object.keys(gBranches);
       gSelID = branchnames[Math.floor(Math.random() * branchnames.length)];
       gBranchSelect.value = gSelID;
+      document.getElementsByTagName("h1")[0].textContent = "Crash Rates: Recent Year";
+      document.title = "Crash Rates: Recent Year";
+      document.getElementById("selectorplus").hidden = true;
+      var today = new Date();
+      gMinDay = (today.getUTCFullYear() - 1) + "-" +
+          (today.getUTCMonth() < 9 ? "0" : "") + (today.getUTCMonth() + 1 ) + "-" +
+          (today.getUTCDate() < 10 ? "0" : "") + today.getUTCDate();
+      gType = "office";
     }
     else {
       location.href = "?fxrel";
@@ -247,6 +263,9 @@ function graphData(aData) {
       var crUnit = (gBranches[gSelID].maxCrashes > 1e6) ? "M" : "k";
       var crUnitNum = (gBranches[gSelID].maxCrashes > 1e6) ? 1e6 : 1e3;
       var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
+      if (gUseADI && gType && gBranches[gSelID]["maxRate_" + gType]) {
+        yAxisMax = gBranches[gSelID]["maxRate_" + gType];
+      }
       var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
     }
     // Add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
@@ -312,28 +331,30 @@ function graphData(aData) {
     }
     else {
       for (var day in aData) {
-        dataArray = [ new Date(day) ];
-        if (gADIGraph) {
-          dataArray.push(aData[day].adi / crUnitNum);
-        }
-        else {
-          if (gBranches[gSelID].sumContent && gCombineBrowser) {
-            browserCrashes = aData[day].crashes["Browser"];
-            if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
-            dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        if (!gMinDay || day > gMinDay) {
+          dataArray = [ new Date(day) ];
+          if (gADIGraph) {
+            dataArray.push(aData[day].adi / crUnitNum);
           }
           else {
-            dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-            if (gBranches[gSelID].content) {
-              dataArray.push(aData[day].crashes["Content"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+            if (gBranches[gSelID].sumContent && gCombineBrowser) {
+              browserCrashes = aData[day].crashes["Browser"];
+              if (aData[day].crashes["Content"]) { browserCrashes += aData[day].crashes["Content"]; }
+              dataArray.push(browserCrashes * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+            }
+            else {
+              dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+              if (gBranches[gSelID].content) {
+                dataArray.push(aData[day].crashes["Content"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+              }
+            }
+            if (gBranches[gSelID].plugins) {
+              dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+              dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
             }
           }
-          if (gBranches[gSelID].plugins) {
-            dataArray.push(aData[day].crashes["OOP Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-            dataArray.push(aData[day].crashes["Hang Plugin"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-          }
+          graphData.push(dataArray);
         }
-        graphData.push(dataArray);
       }
     }
 
@@ -383,7 +404,7 @@ function graphData(aData) {
     }
     var graphOptions = {
       title: gBranches[gSelID].title,
-      ylabel: gADIGraph ? "ADI" : (gUseADI ? "crashes / 100 ADI" : "crashes"),
+      ylabel: gADIGraph ? "ADI" : (gUseADI ? "submitted crashes / 100 ADI" : "submitted crashes"),
       valueRange: [0, yAxisMax + .01],
       axes: {
         x: {
