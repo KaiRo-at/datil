@@ -176,6 +176,11 @@ window.onload = function() {
       gSelID = urlAnchor;
       gBranchSelect.value = urlAnchor;
     }
+    else if (urlAnchor == "office") {
+      var branchnames = Object.keys(gBranches);
+      gSelID = branchnames[Math.floor(Math.random() * branchnames.length)];
+      gBranchSelect.value = gSelID;
+    }
     else {
       location.href = "?fxrel";
     }
