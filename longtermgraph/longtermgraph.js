@@ -117,7 +117,9 @@ window.onload = function() {
   gBody = document.getElementsByTagName("body")[0];
   gBranchSelect = document.getElementById("branch");
   gBranchSelect.onchange = function() {
-    location.href = "?" + gBranchSelect.value + (gADIGraph ? "-adi" : (gCategoryGraph ? "-bcat" : ""));
+    location.href = "?" + gBranchSelect.value +
+                    (gADIGraph ? "-adi" :
+                      (gCategoryGraph ? "-" + gCategoryProcess.charAt(0) + "cat" : ""));
   }
   var option;
   for (var branchID in gBranches) {
@@ -153,8 +155,20 @@ window.onload = function() {
       else if (urlAParts[1] == "bcat") {
         gCategoryGraph = true;
         gCategoryProcess = "browser";
-        document.getElementsByTagName("h1")[0].textContent += " - Categories (browser process)";
-        document.title += " - Categories (browser)";
+        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+        document.title += " - Categories (" + gCategoryProcess + ")";
+      }
+      else if (urlAParts[1] == "ccat") {
+        gCategoryGraph = true;
+        gCategoryProcess = "content";
+        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+        document.title += " - Categories (" + gCategoryProcess + ")";
+      }
+      else if (urlAParts[1] == "pcat") {
+        gCategoryGraph = true;
+        gCategoryProcess = "plugin";
+        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+        document.title += " - Categories (" + gCategoryProcess + ")";
       }
       urlAnchor = urlAParts[0];
     }
@@ -230,12 +244,15 @@ function graphData(aData) {
       var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
       var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
     }
-    // add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
+    // Add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
     if (gCategoryGraph) {
+      // Match the field name for the total - for plugins, we take only crashes, not hangs.
+      var totalField = (gCategoryProcess == "plugin" ? "OOP " : "") +
+                       gCategoryProcess.charAt(0).toUpperCase() + gCategoryProcess.slice(1);
       for (var day in gCatData) {
         dataArray = [ new Date(day) ];
-        if (aData[day].crashes["Browser"]) {
-          dataArray.push(aData[day].crashes["Browser"] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+        if (aData[day].crashes[totalField]) {
+          dataArray.push(aData[day].crashes[totalField] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
@@ -276,11 +293,14 @@ function graphData(aData) {
         else {
           dataArray.push(0);
         }
-        if (gCatData[day].shutdownhang) {
-          dataArray.push(gCatData[day].shutdownhang * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
-         }
-        else {
-          dataArray.push(0);
+        if (gCategoryProcess == "browser") {
+          // Those do not make sense in other processes.
+          if (gCatData[day].shutdownhang) {
+            dataArray.push(gCatData[day].shutdownhang * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
+          }
+          else {
+            dataArray.push(0);
+          }
         }
        graphData.push(dataArray);
       }
@@ -328,8 +348,10 @@ function graphData(aData) {
       colors.push("#FFCC00");
       labels.push("unsymbolized: file@0x...");
       colors.push("#FF8000");
-      labels.push("shutdownhang (>1min)");
-      colors.push("#808080");
+      if (gCategoryProcess == "browser") {
+        labels.push("shutdownhang (>1min)");
+        colors.push("#808080");
+      }
     }
     else if (gADIGraph) {
       labels.push("ADI");
