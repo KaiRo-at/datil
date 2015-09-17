@@ -82,7 +82,7 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "41.0b6",
+        version: "41.0b10",
         appendver: true,
         adu: { low: 6e4, min: 3e4 },
         rate: { high: 2, max: 2.5 },
