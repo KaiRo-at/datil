@@ -11,48 +11,44 @@ var gProductData = {
       nightly: {
         name: "Nightly",
         version: "44.0a1",
-        adu: { low: 7e4, min: 4e4 }, // ADUs
-        rate: { high: 2.0, max: 2.5 }, // crashes per 100 ADU
-        sigcnt: { high: 1e3, max: 1.5e3 }, // # of signatures
-        startup: { high: 20, max: 30 }, // percent of total crashes
-        flashhang: { high: .1, max: .3 }, // Flash hangs per 100 ADU
-        flashcrash: { high: .1, max: .2 }, // Flash crashes per 100 ADU
-        opentracking: { high: 10, max: 20 },
+        versions: { },
+        adi: { low: 8e4, min: 5e4 }, // ADUs
+        rateBrCo: { high: 2.0, max: 3.0 }, // browser+content crashes per 100 ADI
+        startup: { high: 0.3, max: 0.6 }, // browser startup crashes per 100 ADI
+        plugincrash: { high: .09, max: .2 }, // plugin crashes per 100 ADI
+        pluginhang: { high: .05, max: .2 }, // plugin hangs per 100 ADI
       },
       aurora: {
-        name: "Aurora",
+        name: "Dev Ed",
         version: "43.0a2",
-        adu: { low: 2.5e5, min: 1e5 },
-        rate: { high: 1.8, max: 2.2 },
-        sigcnt: { high: 2e3, max: 3e3 },
-        startup: { high: 20, max: 30 },
-        flashhang: { high: .1, max: .3 },
-        flashcrash: { high: .1, max: .2 },
-        opentracking: { high: 10, max: 30 },
+        versions: { },
+        adi: { low: 1.3e5, min: 1e5 },
+        rateBrCo: { high: 1.5, max: 2.0 },
+        startup: { high: 0.25, max: 0.4 },
+        plugincrash: { high: .09, max: .2 },
+        pluginhang: { high: .05, max: .2 },
       },
       beta: {
         name: "Beta",
         version: "42.0b",
         appendver: true,
-        adu: { low: 2e6, min: 1e6 },
-        rate: { high: 1.6, max: 1.9 },
-        sigcnt: { high: 8e3, max: 1e4 },
-        startup: { high: 20, max: 25 },
-        flashhang: { high: .1, max: .3 },
-        flashcrash: { high: .1, max: .2 },
-        opentracking: { high: 5, max: 20 },
+        versions: { },
+        adi: { low: 2e6, min: 1.4e6 },
+        rateBrCo: { high: 1.0, max: 1.25 },
+        startup: { high: 0.2, max: 0.25 },
+        plugincrash: { high: .09, max: .2 },
+        pluginhang: { high: .09, max: .2 },
       },
       release: {
         name: "Release",
         version: "41.0.1",
         appendver: true,
-        adu: { low: 7e7, min: 2e7 },
-        rate: { factor: 1, high: 1.5, max: 1.75 },
-        sigcnt: { high: 2e4, max: 2.5e4 },
-        startup: { high: 15, max: 20 },
-        flashhang: { high: .1, max: .3 },
-        flashcrash: { high: .1, max: .2 },
-        opentracking: { high: 2, max: 5 },
+        versions: { },
+        adi: { low: 1e8, min: 7e7 },
+        rateBrCo: { factor: 1, high: 0.95, max: 1.1 },
+        startup: { high: 0.15, max: 0.20 },
+        plugincrash: { high: .09, max: .15 },
+        pluginhang: { high: .09, max: .15 },
       },
     },
   },
@@ -60,60 +56,91 @@ var gProductData = {
     name: "Firefox for Android",
     full: "FennecAndroid",
     abbr: "fna",
-    noflash: true,
+    noplugin: true,
     channels: {
       nightly: {
         name: "Nightly",
         version: "44.0a1",
-        adu: { low: 1000, min: 500 },
-        rate: { high: 2, max: 5 },
-        sigcnt: { high: 150, max: 250 },
-        startup: { high: 25, max: 40 },
-        opentracking: { high: 10, max: 20 },
+        versions: { },
+        adi: { low: 1.5e3, min: 1e3 },
+        rateBrCo: { high: 5, max: 9 },
+        startup: { high: 2, max: 5 },
       },
       aurora: {
         name: "Aurora",
         version: "43.0a2",
-        adu: { low: 4e3, min: 1e3 },
-        rate: { high: 2, max: 4 },
-        sigcnt: { high: 250, max: 400 },
-        startup: { high: 25, max: 40 },
-        opentracking: { high: 10, max: 30 },
+        versions: { },
+        adi: { low: 1.5e3, min: 1e3 },
+        rateBrCo: { high: 4, max: 7 },
+        startup: { high: 1.5, max: 3 },
       },
       beta: {
         name: "Beta",
         version: "42.0b1",
         appendver: true,
-        adu: { low: 6e4, min: 3e4 },
-        rate: { high: 2, max: 2.5 },
-        sigcnt: { high: 2e3, max: 3e3 },
-        startup: { high: 25, max: 40 },
-        opentracking: { high: 5, max: 20 },
+        versions: { },
+        adi: { low: 9e4, min: 8e4 },
+        rateBrCo: { high: 2.0, max: 2.5 },
+        startup: { high: 0.75, max: 1 },
       },
       release: {
         name: "Release",
         version: "41.0",
         appendver: true,
-        adu: { low: 2e6, min: 5e5 },
-        rate: { high: 1.5, max: 2.0 },
-        sigcnt: { high: 7e3, max: 1e4 },
-        startup: { high: 25, max: 40 },
-        opentracking: { high: 2, max: 5 },
+        versions: { },
+        adi: { low: 4.4e6, min: 3.8e6 },
+        rateBrCo: { high: 1.3, max: 1.6 },
+        startup: { high: 0.35, max: 0.45 },
       },
     },
   },
 };
 
 var gSources = {
-  adu: {
+  versions: {
+    precision: null,
+    unit: "plain",
+    noLimits: true,
+    hasInfoValue: true,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " + aProd.channels[aChannel].name;
+    },
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+    },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay] || !aData[gDay].versions)
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[gDay].versions[0] + (aData[gDay].versions.length > 1 ? " - " + aData[gDay].versions[aData[gDay].versions.length - 1]: ""), aCBData);
+          }
+      );
+    },
+    getInfoValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay] || !aData[gDay].versions)
+              aCallback(null, aCBData);
+            else
+              aCallback(aData[gDay].versions.join(', '), aCBData);
+          }
+      );
+    },
+  },
+  adi: {
     precision: null,
     unit: "kMG",
     lowLimits: true,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].version;
+      return aProd.full + " " + aProd.channels[aChannel].name;
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-daily.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -121,25 +148,23 @@ var gSources = {
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData || !aData[aProd.channels[aChannel].version] ||
-                !aData[aProd.channels[aChannel].version][gDay])
+            if (!aData || !aData[gDay] || !aData[gDay].adi)
               aCallback(null, aCBData);
             else
-              aCallback(aData[aProd.channels[aChannel].version][gDay].adu,
-                        aCBData);
+              aCallback(aData[gDay].adi, aCBData);
           }
       );
     },
   },
-  rate: {
+  rateBrCo: {
     precision: 2,
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].version;
+      return aProd.full + " " + aProd.channels[aChannel].name;
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-daily.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -147,172 +172,117 @@ var gSources = {
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData || !aData[aProd.channels[aChannel].version] ||
-                !aData[aProd.channels[aChannel].version][gDay]) {
+            if (!aData || !aData[gDay] || !aData[gDay].crashes || !aData[gDay].adi) {
               aCallback(null, aCBData);
             }
             else {
-              var crashes = parseInt(aData[aProd.channels[aChannel].version][gDay].crashes);
-              var adu = parseInt(aData[aProd.channels[aChannel].version][gDay].adu);
-              var factor = aProd.channels[aChannel].rate.factor ?
-                           aProd.channels[aChannel].rate.factor : 1;
-              aCallback(adu ? (crashes / adu) * 100 * factor : null, aCBData);
+              var crashes = (aData[gDay].crashes["Browser"] ? parseInt(aData[gDay].crashes["Browser"]) : 0)
+                          + (aData[gDay].crashes["Content"] ? parseInt(aData[gDay].crashes["Content"]) : 0);
+              var adi = parseInt(aData[gDay].adi);
+              var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                           aProd.channels[aChannel].rateBrCo.factor : 1;
+              aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
             }
-          }
-      );
-    },
-  },
-  sigcnt: {
-    precision: 0,
-    unit: "",
-    lowLimits: false,
-    getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " +
-             (aProd.channels[aChannel].appendver ?
-              majVer(aProd.channels[aChannel].version) : aChannel);
-    },
-    getSigCntFile: function(aProd, aChannel) {
-      return gAnalysisPath + gDay + "/" + aProd.abbr + "-" +
-             (aProd.channels[aChannel].appendver ?
-              majVer(aProd.channels[aChannel].version) : aChannel) +
-             "-sigcount.csv";
-    },
-    getLinkURL: function(aProd, aChannel) {
-      return false;
-    },
-    getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getSigCntFile(aProd, aChannel), "",
-          function(aSigCnt) {
-            if (!aSigCnt)
-              aCallback(null, aCBData);
-            else
-              aCallback(parseInt(aSigCnt), aCBData);
           }
       );
     },
   },
   startup: {
-    precision: 0,
-    unit: "%",
-    lowLimits: false,
-    getPrettyVersion: function(aProd, aChannel) {
-      if (aProd.channels[aChannel].appendver)
-        return aProd.full + " " + repVer(aProd.channels[aChannel].version) +
-               " " + aChannel;
-      else
-        return aProd.full + " " + aChannel;
-    },
-    getStartupFile: function(aProd, aChannel) {
-      if (aProd.channels[aChannel].appendver)
-        return gAnalysisPath + aProd.abbr + "-" + aChannel + "-" +
-               repVer(aProd.channels[aChannel].version) + ".startup.json";
-      else
-        return gAnalysisPath + aProd.abbr + "-" + aChannel + ".startup.json";
-    },
-    getLinkURL: function(aProd, aChannel) {
-      return false;
-    },
-    getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getStartupFile(aProd, aChannel), "json",
-          function(aData) {
-            if (!aData || !aData[gDay])
-              aCallback(null, aCBData);
-            else
-              aCallback((aData[gDay].startup.browser && aData[gDay].total) ?
-                        aData[gDay].startup.browser / aData[gDay].total * 100 :
-                        0,
-                        aCBData);
-          }
-      );
-    },
-  },
-  flashhang: {
     precision: 2,
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+      return aProd.full + " " + aProd.channels[aChannel].name;
     },
-    getFlashHangFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.abbr + "-" +
-             repVer(aProd.channels[aChannel].version) + ".flashhang.json";
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+    },
+    getCategoryFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-counts.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
-          function(aData) {
-            if (!aData || !aData[gDay])
+      fetchFile(this.getCategoryFile(aProd, aChannel), "json",
+          function(aCData) {
+            if (!aCData || !aCData[gDay] || !aCData[gDay].startup)
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].adu ?
-                        aData[gDay].total_flash.hang / aData[gDay].adu * 100 :
-                        null,
-                        aCBData);
-          }
+              fetchFile(this.getDataFile(aProd, aChannel), "json",
+                  function(aData) {
+                    if (!aData || !aData[gDay] || !aData[gDay].adi) {
+                      aCallback(null, aCBData);
+                    }
+                    else {
+                      var crashes = aCData[gDay].startup["browser"] ? parseInt(aCData[gDay].startup["browser"]) : 0;
+                      var adi = parseInt(aData[gDay].adi);
+                      var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                                  aProd.channels[aChannel].rateBrCo.factor : 1;
+                      aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
+                    }
+                  }
+              );
+          }.bind(this)
       );
     },
   },
-  flashcrash: {
+  plugincrash: {
     precision: 2,
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + repVer(aProd.channels[aChannel].version);
+      return aProd.full + " " + aProd.channels[aChannel].name;
     },
-    getFlashHangFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.abbr + "-" +
-             repVer(aProd.channels[aChannel].version) + ".flashhang.json";
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getFlashHangFile(aProd, aChannel), "json",
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData || !aData[gDay])
+            if (!aData || !aData[gDay] || !aData[gDay].crashes || !aData[gDay].adi) {
               aCallback(null, aCBData);
-            else
-              aCallback(aData[gDay].adu ?
-                        aData[gDay].total_flash.crash / aData[gDay].adu * 100 :
-                        null,
-                        aCBData);
+            }
+            else {
+              var crashes = aData[gDay].crashes["OOP Plugin"] ? parseInt(aData[gDay].crashes["OOP Plugin"]) : 0;
+              var adi = parseInt(aData[gDay].adi);
+              var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                           aProd.channels[aChannel].rateBrCo.factor : 1;
+              aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
+            }
           }
       );
     },
   },
-  opentracking: {
-    precision: 0,
+  pluginhang: {
+    precision: 2,
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " + Core " + majVer(aProd.channels[aChannel].version);
+      return aProd.full + " " + aProd.channels[aChannel].name;
     },
-    getBugzillaQuery: function(aProd, aChannel) {
-      var mver = majVer(aProd.channels[aChannel].version);
-      var bugprod = aProd.full;
-      if (bugprod == "FennecAndroid") { bugprod = "Firefox%20for%20Android"; }
-      if (bugprod == "MetroFirefox") { bugprod = "Firefox%20for%20Metro"; }
-      return "?keywords=crash&keywords_type=anywords" +
-             "&product=Core&product=Toolkit&product=" + bugprod +
-             "&field0-0-0=cf_tracking_firefox" + mver + "&type0-0-0=equals&value0-0-0=%2B" +
-             "&type0-1-0=nowordssubstr&field0-1-0=cf_status_firefox" + mver
-             + "&query_format=advanced;value0-1-0=fixed%20verified%20disabled%20wontfix%20unaffected";
-    },
-    getTrackersFile: function(aProd, aChannel) {
-      return gBzAPIPath + "count" + this.getBugzillaQuery(aProd, aChannel);
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
-      return gBzBasePath + "buglist.cgi" + this.getBugzillaQuery(aProd, aChannel);
+      return false;
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
-      fetchFile(this.getTrackersFile(aProd, aChannel), "json",
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData)
+            if (!aData || !aData[gDay] || !aData[gDay].crashes || !aData[gDay].adi) {
               aCallback(null, aCBData);
-            else
-              aCallback(aData.data, aCBData);
+            }
+            else {
+              var crashes = aData[gDay].crashes["Hang Plugin"] ? parseInt(aData[gDay].crashes["Hang Plugin"]) : 0;
+              var adi = parseInt(aData[gDay].adi);
+              var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                           aProd.channels[aChannel].rateBrCo.factor : 1;
+              aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
+            }
           }
       );
     },
@@ -322,7 +292,8 @@ var gSources = {
 var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
-var gAnalysisPath = "../../";
+//var gAnalysisPath = "../../";
+var gAnalysisPath = "../socorro/";
 var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 
@@ -359,11 +330,11 @@ function processData() {
       var cdata = gProductData[product].channels[channel];
       var headrow = sect.getElementsByClassName("headers")[0];
       headrow.appendChild(createCell(cdata.name, true));
-      var versionrow = sect.getElementsByClassName("versions")[0];
-      versionrow.appendChild(createCell(cdata.version));
+      //var versionrow = sect.getElementsByClassName("versions")[0];
+      //versionrow.appendChild(createCell(cdata.version));
       for (var source in gSources) {
         var sourcerow = sect.getElementsByClassName(source)[0];
-        if (source.indexOf("flash") !== -1 && gProductData[product].noflash) {
+        if (source.indexOf("plugin") !== -1 && gProductData[product].noplugin) {
           sourcerow.classList.add("hidden");
         }
         else {
@@ -407,29 +378,47 @@ function infoEvent(event) {
       // Set info to show.
       info.getElementsByClassName(cell.dataset.source)[0].classList.add("current");
 
-      var limits = gProductData[cell.dataset.product]
-                  .channels[cell.dataset.channel][cell.dataset.source];
-      if (gSources[cell.dataset.source].lowLimits) {
-        info.getElementsByClassName("limits")[0].classList.add("low");
-        document.getElementById("limit1").textContent =
-            formatValue(limits.low,
-                        gSources[cell.dataset.source].precision,
-                        gSources[cell.dataset.source].unit);
-        document.getElementById("limit2").textContent =
-            formatValue(limits.min,
-                        gSources[cell.dataset.source].precision,
-                        gSources[cell.dataset.source].unit);
+      if (gSources[cell.dataset.source].hasInfoValue) {
+        info.getElementsByClassName("infovalue")[0].classList.remove("hidden");
+        gSources[cell.dataset.source]
+        .getInfoValue(gProductData[cell.dataset.product],
+                      cell.dataset.channel,
+                      function(aValue, aCBData) { aCBData.node.textContent = aValue; },
+                      {node: info.getElementsByClassName("infovalue")[0]});
       }
       else {
-        info.getElementsByClassName("limits")[0].classList.add("high");
-        document.getElementById("limit1").textContent =
-            formatValue(limits.high,
-                        gSources[cell.dataset.source].precision,
-                        gSources[cell.dataset.source].unit);
-        document.getElementById("limit2").textContent =
-            formatValue(limits.max,
-                        gSources[cell.dataset.source].precision,
-                        gSources[cell.dataset.source].unit);
+        info.getElementsByClassName("infovalue")[0].classList.add("hidden");
+      }
+
+      if (gSources[cell.dataset.source].noLimits) {
+        info.getElementsByClassName("limits")[0].classList.add("hidden");
+      }
+      else {
+        info.getElementsByClassName("limits")[0].classList.remove("hidden");
+        var limits = gProductData[cell.dataset.product]
+                    .channels[cell.dataset.channel][cell.dataset.source];
+        if (gSources[cell.dataset.source].lowLimits) {
+          info.getElementsByClassName("limits")[0].classList.add("low");
+          document.getElementById("limit1").textContent =
+              formatValue(limits.low,
+                          gSources[cell.dataset.source].precision,
+                          gSources[cell.dataset.source].unit);
+          document.getElementById("limit2").textContent =
+              formatValue(limits.min,
+                          gSources[cell.dataset.source].precision,
+                          gSources[cell.dataset.source].unit);
+        }
+        else {
+          info.getElementsByClassName("limits")[0].classList.add("high");
+          document.getElementById("limit1").textContent =
+              formatValue(limits.high,
+                          gSources[cell.dataset.source].precision,
+                          gSources[cell.dataset.source].unit);
+          document.getElementById("limit2").textContent =
+              formatValue(limits.max,
+                          gSources[cell.dataset.source].precision,
+                          gSources[cell.dataset.source].unit);
+        }
       }
 
       document.getElementById("verinfo").textContent =
@@ -507,17 +496,19 @@ function valueCallback(aValue, aCBData) {
     else {
       aCBData.cell.textContent = value;
     }
-    aCBData.cell.classList.add("num");
-    if (((gSources[aCBData.type].lowLimits) &&
-         (aValue < aCBData.data[aCBData.type].min)) ||
-        (aValue > aCBData.data[aCBData.type].max))
-      aCBData.cell.classList.add("faroff");
-    else if (((gSources[aCBData.type].lowLimits) &&
-              (aValue < aCBData.data[aCBData.type].low)) ||
-             (aValue > aCBData.data[aCBData.type].high))
-      aCBData.cell.classList.add("outside");
-    else
-      aCBData.cell.classList.add("normal");
+    if (!gSources[aCBData.type].noLimits) {
+      aCBData.cell.classList.add("num");
+      if (((gSources[aCBData.type].lowLimits) &&
+          (aValue < aCBData.data[aCBData.type].min)) ||
+          (aValue > aCBData.data[aCBData.type].max))
+        aCBData.cell.classList.add("faroff");
+      else if (((gSources[aCBData.type].lowLimits) &&
+                (aValue < aCBData.data[aCBData.type].low)) ||
+              (aValue > aCBData.data[aCBData.type].high))
+        aCBData.cell.classList.add("outside");
+      else
+        aCBData.cell.classList.add("normal");
+    }
   }
   else {
     aCBData.cell.textContent = "ERR";
@@ -565,6 +556,9 @@ function formatValue(aValue, aPrecision, aUnit) {
       val = val.toFixed(prec);
     }
     formatted = val + unit;
+  }
+  else if (aUnit == "plain") {
+    formatted = aValue;
   }
   else {
     formatted = aValue.toFixed(aPrecision);

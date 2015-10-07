@@ -26,8 +26,8 @@ h1 {
   display: none;
 }
 
-.versions {
-  font-size: small;
+tr.versions {
+  font-size: 66%;
   text-align: center;
 }
 

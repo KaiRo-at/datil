@@ -16,14 +16,14 @@
 <p class="help">Note: Hovering your mouse over a data cell (or tapping it on a touch device) gives more info about its data.</p>
 
 <div id="infobox">
-<p class="info adu">Active daily installations as counted by the AMO blocklist pings</p>
-<p class="info rate">Crash rate in total crashes per 100 ADI</p>
-<p class="info sigcnt">Count of different signatures</p>
-<p class="info startup">Percentage of startup crashes (of total crashes)</p>
-<p class="info flashhang">Hang reports per 100 ADI that have a Flash version detected</p>
-<p class="info flashcrash">Crash (non-hang) reports per 100 ADI that have a Flash version detected</p>
-<p class="info opentracking">Open crash bugs that are marked tracking+ for that release &quot;train&quot;</p>
+<p class="info versions">Versions currently counted for this channel</p>
+<p class="info adi">Active daily installations as counted by the AMO blocklist pings</p>
+<p class="info rateBrCo">Overall crash rate (total for browser and content processes, in crashes per 100 ADI)</p>
+<p class="info startup">Browser startup crash rate (in crashes per 100 ADI)</p>
+<p class="info plugincrash">Plugin process crash rate in crashes per 100 ADI)</p>
+<p class="info pluginhang">Plugin process hang rate in crashes per 100 ADI)</p>
 <p class="version">Value for: <span id="verinfo"></span></p>
+<p class="infovalue"></p>
 <p class="moredata"><a href="" id="moredatalink" target="_blank">View detailed report</a></p>
 <p class="limits">
   <span class="low">low</span><span class="high">high</span>: <span id="limit1"></span> -
@@ -38,13 +38,11 @@
 <table border="1">
 <tr class="headers"><th rowspan="2">Branch</th></tr>
 <tr class="versions"></tr>
-<tr class="adu"><th>ADI</th></tr>
-<tr class="rate"><th>Crash rate</th></tr>
-<tr class="sigcnt defaulthide"><th>Signature count</th></tr>
+<tr class="adi"><th>ADI</th></tr>
+<tr class="rateBrCo"><th>Crash rate (b+c)</th></tr>
 <tr class="startup"><th>Startup crashes</th></tr>
-<tr class="flashhang"><th>Flash hangs</th></tr>
-<tr class="flashcrash"><th>Flash crashes</th></tr>
-<tr class="opentracking"><th>Tracking+ Bugs</th></tr>
+<tr class="plugincrash"><th>Plugin crashes</th></tr>
+<tr class="pluginhang"><th>Plugin hangs</th></tr>
 </table>
 </section>
 </div>
