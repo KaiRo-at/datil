@@ -293,7 +293,8 @@ var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
 var gAnalysisPath = "../../";
-//var gAnalysisPath = "../socorro/";
+//for debugging:
+//gAnalysisPath = "../socorro/";
 var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 

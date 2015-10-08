@@ -9,6 +9,7 @@ body {
 }
 
 h1 {
+  margin-top: .2em;
   margin-bottom: 0;
 }
 
@@ -31,16 +32,28 @@ tr.versions {
   text-align: center;
 }
 
+tr.adi {
+  font-size: 66%;
+}
+
+.adi > .num,
+.rateBrCo > .num {
+  font-size: 100%; /* undo the font size set by .num below */
+}
+
 tr.rateBrCo {
   font-weight: bold;
 }
-
 table {
   border-collapse: collapse;
   border-spacing: 0 0;
 }
 
-th, td {
+th {
+  padding: .2em 3px;
+}
+
+td {
   padding: 1px 3px;
 }
 
@@ -49,7 +62,7 @@ th, td {
 }
 
 .num {
-  font-size: small;
+  font-size: 80%;
   text-align: center;
   vertical-align: middle;
 }
