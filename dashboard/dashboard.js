@@ -7,12 +7,15 @@ var gProductData = {
     name: "Firefox Desktop",
     full: "Firefox",
     abbr: "ff",
+    graphname: "fx",
     channels: {
       nightly: {
         name: "Nightly",
         versions: { },
         adi: { low: 8e4, min: 5e4 }, // ADUs
         rateBrCo: { high: 2.0, max: 3.0 }, // browser+content crashes per 100 ADI
+        browser: { high: 1.2, max: 1.5 }, // browser crashes per 100 ADI
+        content: { high: 0.8, max: 1.5 }, // content crashes per 100 ADI
         startup: { high: 0.3, max: 0.6 }, // browser startup crashes per 100 ADI
         plugincrash: { high: .09, max: .2 }, // plugin crashes per 100 ADI
         pluginhang: { high: .05, max: .2 }, // plugin hangs per 100 ADI
@@ -23,26 +26,31 @@ var gProductData = {
         versions: { },
         adi: { low: 1.3e5, min: 1e5 },
         rateBrCo: { high: 1.5, max: 2.0 },
+        browser: { high: 1.0, max: 1.2 },
+        content: { high: 0.5, max: 0.8 },
         startup: { high: 0.25, max: 0.4 },
         plugincrash: { high: .09, max: .2 },
         pluginhang: { high: .05, max: .2 },
       },
       beta: {
         name: "Beta",
-        appendver: true,
         versions: { },
         adi: { low: 2e6, min: 1.4e6 },
         rateBrCo: { high: 1.0, max: 1.25 },
+        browser: { high: 1.0, max: 1.25 },
+        content: { high: 0.01, max: 0.01 },
         startup: { high: 0.2, max: 0.25 },
         plugincrash: { high: .09, max: .2 },
         pluginhang: { high: .09, max: .2 },
       },
       release: {
         name: "Release",
-        appendver: true,
+        graphname: "rel",
         versions: { },
         adi: { low: 1e8, min: 7e7 },
         rateBrCo: { factor: 1, high: 0.95, max: 1.1 },
+        browser: { high: 0.95, max: 1.1 },
+        content: { high: 0.01, max: 0.01 },
         startup: { high: 0.15, max: 0.20 },
         plugincrash: { high: .09, max: .15 },
         pluginhang: { high: .09, max: .15 },
@@ -53,7 +61,9 @@ var gProductData = {
     name: "Firefox for Android",
     full: "FennecAndroid",
     abbr: "fna",
+    graphname: "and",
     noplugin: true,
+    nocontent: true,
     channels: {
       nightly: {
         name: "Nightly",
@@ -71,7 +81,6 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        appendver: true,
         versions: { },
         adi: { low: 9e4, min: 8e4 },
         rateBrCo: { high: 2.0, max: 2.5 },
@@ -79,7 +88,7 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        appendver: true,
+        graphname: "rel",
         versions: { },
         adi: { low: 4.4e6, min: 3.8e6 },
         rateBrCo: { high: 1.3, max: 1.6 },
@@ -170,7 +179,9 @@ var gSources = {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
-      return false;
+      return gGraphBasePath + "?" +
+             (aProd.graphname ? aProd.graphname : aProd.abbr) +
+             (aProd.channels[aChannel].graphname ? aProd.channels[aChannel].graphname : aChannel);
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
@@ -181,6 +192,70 @@ var gSources = {
             else {
               var crashes = (aData[gDay].crashes["Browser"] ? parseInt(aData[gDay].crashes["Browser"]) : 0)
                           + (aData[gDay].crashes["Content"] ? parseInt(aData[gDay].crashes["Content"]) : 0);
+              var adi = parseInt(aData[gDay].adi);
+              var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                           aProd.channels[aChannel].rateBrCo.factor : 1;
+              aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
+            }
+          }
+      );
+    },
+  },
+  browser: {
+    precision: 2,
+    unit: "",
+    lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
+    },
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+    },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay] || !aData[gDay].crashes || !aData[gDay].adi) {
+              aCallback(null, aCBData);
+            }
+            else {
+              var crashes = (aData[gDay].crashes["Browser"] ? parseInt(aData[gDay].crashes["Browser"]) : 0);
+              var adi = parseInt(aData[gDay].adi);
+              var factor = aProd.channels[aChannel].rateBrCo.factor ?
+                           aProd.channels[aChannel].rateBrCo.factor : 1;
+              aCallback(adi ? (crashes / adi) * 100 * factor : null, aCBData);
+            }
+          }
+      );
+    },
+  },
+  content: {
+    precision: 2,
+    unit: "",
+    lowLimits: false,
+    getPrettyVersion: function(aProd, aChannel) {
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
+    },
+    getDataFile: function(aProd, aChannel) {
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+    },
+    getLinkURL: function(aProd, aChannel) {
+      return false;
+    },
+    getValue: function(aProd, aChannel, aCallback, aCBData) {
+      fetchFile(this.getDataFile(aProd, aChannel), "json",
+          function(aData) {
+            if (!aData || !aData[gDay] || !aData[gDay].crashes || !aData[gDay].adi) {
+              aCallback(null, aCBData);
+            }
+            else {
+              var crashes = (aData[gDay].crashes["Content"] ? parseInt(aData[gDay].crashes["Content"]) : 0);
               var adi = parseInt(aData[gDay].adi);
               var factor = aProd.channels[aChannel].rateBrCo.factor ?
                            aProd.channels[aChannel].rateBrCo.factor : 1;
@@ -206,7 +281,10 @@ var gSources = {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-counts.json";
     },
     getLinkURL: function(aProd, aChannel) {
-      return false;
+      return gGraphBasePath + "?" +
+             (aProd.graphname ? aProd.graphname : aProd.abbr) +
+             (aProd.channels[aChannel].graphname ? aProd.channels[aChannel].graphname : aChannel) +
+             "-bcat";
     },
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getCategoryFile(aProd, aChannel), "json",
@@ -305,6 +383,7 @@ var gDay;
 var gAnalysisPath = (location.hostname == "localhost") ? "../socorro/" : "../../";
 var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
+var gGraphBasePath = "https://arewestableyet.com/graph/";
 
 window.onload = function() {
   gDebug = document.getElementById("debug");
@@ -346,6 +425,10 @@ function processData() {
       for (var source in gSources) {
         var sourcerow = sect.getElementsByClassName(source)[0];
         if (source.indexOf("plugin") !== -1 && gProductData[product].noplugin) {
+          sourcerow.classList.add("hidden");
+        }
+        else if ((source == "browser" || source == "content") &&
+                 gProductData[product].nocontent) {
           sourcerow.classList.add("hidden");
         }
         else {
