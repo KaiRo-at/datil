@@ -10,7 +10,6 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "44.0a1",
         versions: { },
         adi: { low: 8e4, min: 5e4 }, // ADUs
         rateBrCo: { high: 2.0, max: 3.0 }, // browser+content crashes per 100 ADI
@@ -20,7 +19,7 @@ var gProductData = {
       },
       aurora: {
         name: "Dev Ed",
-        version: "43.0a2",
+        fullname: "Developer Edition",
         versions: { },
         adi: { low: 1.3e5, min: 1e5 },
         rateBrCo: { high: 1.5, max: 2.0 },
@@ -30,7 +29,6 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "42.0b",
         appendver: true,
         versions: { },
         adi: { low: 2e6, min: 1.4e6 },
@@ -41,7 +39,6 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "41.0.1",
         appendver: true,
         versions: { },
         adi: { low: 1e8, min: 7e7 },
@@ -60,7 +57,6 @@ var gProductData = {
     channels: {
       nightly: {
         name: "Nightly",
-        version: "44.0a1",
         versions: { },
         adi: { low: 1.5e3, min: 1e3 },
         rateBrCo: { high: 5, max: 9 },
@@ -68,7 +64,6 @@ var gProductData = {
       },
       aurora: {
         name: "Aurora",
-        version: "43.0a2",
         versions: { },
         adi: { low: 1.5e3, min: 1e3 },
         rateBrCo: { high: 4, max: 7 },
@@ -76,7 +71,6 @@ var gProductData = {
       },
       beta: {
         name: "Beta",
-        version: "42.0b1",
         appendver: true,
         versions: { },
         adi: { low: 9e4, min: 8e4 },
@@ -85,7 +79,6 @@ var gProductData = {
       },
       release: {
         name: "Release",
-        version: "41.0",
         appendver: true,
         versions: { },
         adi: { low: 4.4e6, min: 3.8e6 },
@@ -103,7 +96,9 @@ var gSources = {
     noLimits: true,
     hasInfoValue: true,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -117,7 +112,11 @@ var gSources = {
             if (!aData || !aData[gDay] || !aData[gDay].versions)
               aCallback(null, aCBData);
             else
-              aCallback(aData[gDay].versions[0] + (aData[gDay].versions.length > 1 ? " - " + aData[gDay].versions[aData[gDay].versions.length - 1]: ""), aCBData);
+              aCallback(aData[gDay].versions[0] +
+                        (aData[gDay].versions.length > 1
+                             ? " - " + aData[gDay].versions[aData[gDay].versions.length - 1]
+                             : ""),
+                        aCBData);
           }
       );
     },
@@ -137,7 +136,9 @@ var gSources = {
     unit: "kMG",
     lowLimits: true,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -161,7 +162,9 @@ var gSources = {
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -192,7 +195,9 @@ var gSources = {
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -232,7 +237,9 @@ var gSources = {
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -262,7 +269,9 @@ var gSources = {
     unit: "",
     lowLimits: false,
     getPrettyVersion: function(aProd, aChannel) {
-      return aProd.full + " " + aProd.channels[aChannel].name;
+      return aProd.full + " " +
+             (aProd.channels[aChannel].fullname ? aProd.channels[aChannel].fullname
+                                                : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
       return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
@@ -292,9 +301,8 @@ var gSources = {
 var gDebug, gLog;
 var gDay;
 //var gAnalysisPath = "https://crash-analysis.mozilla.com/rkaiser/";
-var gAnalysisPath = "../../";
-//for debugging:
-//gAnalysisPath = "../socorro/";
+// For debugging/development, this is run on localhost.
+var gAnalysisPath = (location.hostname == "localhost") ? "../socorro/" : "../../";
 var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 
@@ -330,9 +338,11 @@ function processData() {
     for (var channel in gProductData[product].channels) {
       var cdata = gProductData[product].channels[channel];
       var headrow = sect.getElementsByClassName("headers")[0];
-      headrow.appendChild(createCell(cdata.name, true));
-      //var versionrow = sect.getElementsByClassName("versions")[0];
-      //versionrow.appendChild(createCell(cdata.version));
+      var headcell = createCell(cdata.name, true);
+      if (cdata.fullname) {
+        headcell.setAttribute("title", cdata.fullname);
+      }
+      headrow.appendChild(headcell);
       for (var source in gSources) {
         var sourcerow = sect.getElementsByClassName(source)[0];
         if (source.indexOf("plugin") !== -1 && gProductData[product].noplugin) {

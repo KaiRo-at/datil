@@ -10,9 +10,8 @@ var gBody, gGraph, gSelID,
     gUseADI = true, gCombineBrowser = true, gADIGraph = false,
     gCategoryGraph = false, gCategoryProcess = "browser", gCatData;
 
-var gDataPath = "../../";
-// for local debugging
-//gDataPath = "../socorro/";
+// For debugging/development, this is run on localhost.
+var gDataPath = (location.hostname == "localhost") ? "../socorro/" : "../../";
 
 var gBranches = {
   fxrel: {
