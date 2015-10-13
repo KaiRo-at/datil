@@ -459,6 +459,10 @@ function graphData(aData) {
                   (aData[i].series == "browser+content crashes")) {
                 aData[i].series = "browser crashes";
               }
+              if (gBranches[gSelID].sumContent && gCombineBrowser &&
+                  (aData[i].series == "content crashes")) {
+                aData[i].series = "browser+content crashes";
+              }
             }
             if (gDataIssueDays) {
               for (var i = 0; i < gDataIssueDays.length; i++) {
