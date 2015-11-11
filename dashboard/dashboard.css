@@ -23,6 +23,13 @@ h1 {
   font-size: 75%;
 }
 
+#notification {
+  margin: .5em;
+  padding: .5em;
+  background-color: #FFBB44;
+  color: #000000;
+}
+
 #none, .hidden {
   display: none;
 }

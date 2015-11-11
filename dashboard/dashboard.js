@@ -389,6 +389,19 @@ window.onload = function() {
   gDebug = document.getElementById("debug");
   gLog = document.getElementById("debugLog");
 
+  // See if there is a notification and if so, display it.
+  fetchFile("notification.txt", "",
+    function(aData) {
+      if (aData) {
+        document.getElementById("notification").innerHTML = aData;
+        document.getElementById("notification").classList.remove("hidden");
+      }
+      else {
+        console.log("No notification found.");
+      }
+    }
+  );
+
   // Get date to analyze.
   fetchFile(gAnalysisPath + "latestdate.txt", "",
     function(aData) {
