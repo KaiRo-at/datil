@@ -145,6 +145,20 @@ window.onload = function() {
     graphData(gRawData);
   }
 
+  // See if there is a notification and if so, display it.
+  fetchFile("notification.txt", "",
+    function(aData) {
+      if (aData) {
+        document.getElementById("notification").innerHTML = aData;
+        document.getElementById("notification").classList.remove("hidden");
+        window.onresize();
+      }
+      else {
+        console.log("No notification found.");
+      }
+    }
+  );
+
   if (location.search) {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
     var urlAParts = urlAnchor.split("-");

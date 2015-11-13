@@ -38,6 +38,13 @@ h1 {
   text-align: center;
 }
 
+#notification {
+  margin: .5em;
+  padding: .5em;
+  background-color: #FFBB44;
+  color: #000000;
+}
+
 #graphdiv {
 }
 
