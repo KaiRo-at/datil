@@ -45,6 +45,10 @@ h1 {
   color: #000000;
 }
 
+.hidden {
+  display: none;
+}
+
 #graphdiv {
 }
 
