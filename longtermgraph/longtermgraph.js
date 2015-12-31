@@ -163,14 +163,14 @@ window.onload = function() {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
     var urlAParts = urlAnchor.split("-");
     if (urlAParts.length > 1) {
-      if (urlAParts[1] == "adi") {
+/*      if (urlAParts[1] == "adi") {
         gADIGraph = true;
         gUseADI = false; // This turns on the usage of units like 'M' and 'k'.
         document.getElementsByTagName("h1")[0].textContent = "ADI History";
         document.title = "ADI History";
         document.getElementById("selectorsubline").hidden = true;
       }
-      else if (urlAParts[1] == "bcat") {
+      else */if (urlAParts[1] == "bcat") {
         gCategoryGraph = true;
         gCategoryProcess = "browser";
         document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
@@ -193,7 +193,6 @@ window.onload = function() {
       }
       urlAnchor = urlAParts[0];
     }
-    gADIGraph = false;
     if (urlAnchor in gBranches) {
       gSelID = urlAnchor;
       gBranchSelect.value = urlAnchor;
