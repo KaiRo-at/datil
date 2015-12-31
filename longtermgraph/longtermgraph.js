@@ -193,6 +193,7 @@ window.onload = function() {
       }
       urlAnchor = urlAParts[0];
     }
+    gADIGraph = false;
     if (urlAnchor in gBranches) {
       gSelID = urlAnchor;
       gBranchSelect.value = urlAnchor;
