@@ -1,0 +1,1 @@
+Due to issues still under investigation, all crash volume data since 2015-12-30 is wrong. The Socorro team is working on it.
