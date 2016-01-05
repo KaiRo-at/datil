@@ -1,1 +1,1 @@
-Due to issues still under investigation, all crash volume data since 2015-12-30 is wrong. The Socorro team is working on it.
+Due to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1236943">issues still under investigation</a>, all crash volume data since 2015-12-30 is artificially low. The Socorro team is working on it.
