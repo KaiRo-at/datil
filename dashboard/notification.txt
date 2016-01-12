@@ -1,1 +1,1 @@
-Due to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1236943">issues still under investigation</a>, all crash volume data since 2015-12-30 is artificially low. The Socorro team is working on it.
+Crash rates for some days around the turn of the year are still off due to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1236943">Socorro issues</a>, Jan 4 and later data is accurate again, some more days might be becovarable and are worked on.
