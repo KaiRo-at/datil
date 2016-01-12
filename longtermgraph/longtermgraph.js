@@ -33,7 +33,7 @@ var gBranches = {
     annotationfile: "Firefox-beta-annotations.json",
     countsfile: "Firefox-beta-counts.json",
     plugins: true,
-    content: false,
+    content: true,
     sumContent: true,
     maxRate: 4,
     maxCrashes: 80e3,
@@ -122,7 +122,7 @@ window.onload = function() {
   gBranchSelect = document.getElementById("branch");
   gBranchSelect.onchange = function() {
     location.href = "?" + gBranchSelect.value +
-                    (gADIGraph ? "-adi" :
+                    (gADIGraph ? "-blp" :
                       (gCategoryGraph ? "-" + gCategoryProcess.charAt(0) + "cat" : ""));
   }
   var option;
@@ -163,14 +163,14 @@ window.onload = function() {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
     var urlAParts = urlAnchor.split("-");
     if (urlAParts.length > 1) {
-/*      if (urlAParts[1] == "adi") {
+      if (urlAParts[1] == "blp") {
         gADIGraph = true;
         gUseADI = false; // This turns on the usage of units like 'M' and 'k'.
-        document.getElementsByTagName("h1")[0].textContent = "ADI History";
-        document.title = "ADI History";
+        document.getElementsByTagName("h1")[0].textContent = "BLP History";
+        document.title = "BLP History";
         document.getElementById("selectorsubline").hidden = true;
       }
-      else */if (urlAParts[1] == "bcat") {
+      else if (urlAParts[1] == "bcat") {
         gCategoryGraph = true;
         gCategoryProcess = "browser";
         document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
@@ -393,7 +393,7 @@ function graphData(aData) {
       }
     }
     else if (gADIGraph) {
-      labels.push("ADI");
+      labels.push("BLP");
       colors.push("#004080");
     }
     else {
@@ -417,7 +417,7 @@ function graphData(aData) {
     }
     var graphOptions = {
       title: gBranches[gSelID].title,
-      ylabel: gADIGraph ? "ADI" : (gUseADI ? "submitted crashes / 100 ADI" : "submitted crashes"),
+      ylabel: gADIGraph ? "BLP" : (gUseADI ? "submitted crashes / 100 ADI" : "submitted crashes"),
       valueRange: [0, yAxisMax + .01],
       axes: {
         x: {
@@ -467,7 +467,7 @@ function graphData(aData) {
               if (gADIGraph &&
                   (aData[i].series == "browser+content crashes" ||
                    aData[i].series == "browser crashes")) {
-                aData[i].series = "ADI";
+                aData[i].series = "BLP";
               }
               if (gBranches[gSelID].sumContent && !gCombineBrowser &&
                   (aData[i].series == "browser+content crashes")) {
@@ -484,7 +484,7 @@ function graphData(aData) {
                   series: labels[labels.length - 1],
                   x: Date.parse(gDataIssueDays[i]),
                   shortText: "D",
-                  text: "Data Issue (missing ADI or crashes)",
+                  text: "Data Issue (missing BLP/ADI or crashes)",
                   attachAtBottom: true,
                   cssClass: "dataissue",
                 });
