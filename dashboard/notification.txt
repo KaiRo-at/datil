@@ -1,1 +1,0 @@
-Crash rates for some days around the turn of the year are still off due to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1236943">Socorro issues</a>, Jan 4 and later data is accurate again, some more days might be becovarable and are worked on.
