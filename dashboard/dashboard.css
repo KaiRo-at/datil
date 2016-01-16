@@ -129,3 +129,15 @@ td > a {
 #debugLog {
   display: none;
 }
+
+/* common footer */
+
+#footer {
+  margin-top: 2em;
+  border-top: 1px solid #CCCCCC;
+  font-size: .75em;
+  color: #8080CC;
+}
+
+#footer a:link, #footer a:visited { color: #AA99CC; }
+#footer a:hover, #footer a:active { color: #663399; }

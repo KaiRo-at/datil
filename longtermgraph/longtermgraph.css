@@ -66,3 +66,15 @@ h1 {
   border-color: #404040 !important;
   background-color: #CCCCCC !important;
 }
+
+/* common footer */
+
+#footer {
+  margin-top: .5em;
+  border-top: 1px solid #CCCCCC;
+  font-size: .75em;
+  color: #8080CC;
+}
+
+#footer a:link, #footer a:visited { color: #AA99CC; }
+#footer a:hover, #footer a:active { color: #663399; }

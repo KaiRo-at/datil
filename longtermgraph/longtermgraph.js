@@ -257,6 +257,7 @@ window.onresize = function() {
   gGraph.resize(
     gBody.clientWidth,
     gBody.clientHeight - document.getElementById("graphdiv").offsetTop
+                       - document.getElementById("footer").offsetHeight
   );
 }
 
@@ -447,7 +448,8 @@ function graphData(aData) {
       labelsSeparateLines: true,
       labelsShowZeroValues: true,
       width: gBody.clientWidth,
-      height: gBody.clientHeight - graphDiv.offsetTop,
+      height: gBody.clientHeight - graphDiv.offsetTop
+                                 - document.getElementById("footer").offsetHeight,
     };
 
     gGraph = new Dygraph(graphDiv, graphData, graphOptions);
