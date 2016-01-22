@@ -9,8 +9,8 @@ var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
-var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser", gLimit = 10; //300;
-var gStartDate, gEndDate, gDuration = 7, gSearchString;
+var gProduct = "Firefox", gVersion = "44.0b1", gProcess = "browser", gLimit = 10; //300;
+var gStartDate, gEndDate, gDuration = 7, gDateNow = false, gSearchString;
 var gScores = {}, gSocorroAPIToken, gBugInfo = {};
 
 
@@ -19,13 +19,48 @@ window.onload = function() {
   gLog = document.getElementById("debugLog");
   gSocorroAPIToken = getParameterByName("token");
 
+  var product = getParameterByName("product");
+  if (product.match(/^(\w+)+$/)) {
+    gProduct = product;
+  }
   var ver = getParameterByName("version");
-  if (ver.match(/^(\d+\.)+[\dab]+/)) {
+  if (ver.match(/^(\d+\.)+[\dab]+$/)) {
     gVersion = ver;
   }
   var limit = getParameterByName("limit");
-  if (limit.match(/^(\d+)+/) && (limit >= 3) && (limit <= 1000)) {
+  if (limit.match(/^(\d+)+$/) && (limit >= 3) && (limit <= 1000)) {
     gLimit = limit;
+  }
+  var duration = getParameterByName("duration");
+  if (duration.match(/^(\d+)+$/) && (duration >= 1) && (duration <= 30)) {
+    gDuration = duration;
+  }
+  if (getParameterByName("date") == "now") {
+    gDateNow = true;
+  }
+  switch (getParameterByName("process")) {
+    case "bc":
+    case "browsercontent":
+    case "browser+content":
+    case "browser content":
+      gProcess = "browser+content";
+      break;
+     case "b":
+    case "browser":
+      gProcess = "browser";
+      break;
+    case "c":
+    case "content":
+      gProcess = "content";
+      break;
+    case "p":
+    case "plugin":
+    case "plugins":
+      gProcess = "plugin";
+      break;
+    default:
+      gProcess = (gProduct == "Firefox") ? "browser+content" : "browser";
+      break;
   }
 
   //if (!gSocorroAPIToken) {
@@ -36,33 +71,29 @@ window.onload = function() {
   //  $err.appendChild(document.createTextNode(" and hand it over with the ?token=... parameter!"));
   //}
   //else {
-    fetchFile(gSocorroPath + "api/CrontabberState/", "json",
-      function(aData) {
-        if (aData) {
-          var matviewTime = new Date(aData.state["signatures-matview"].last_success);
-          //matviewTime.setDate(matviewTime.getDate() - 1); // subtract one day
-          gEndDate = makeDate(matviewTime);
-          matviewTime.setDate(matviewTime.getDate() - gDuration); // subtract one day
-          gStartDate = makeDate(matviewTime);
-          document.getElementById("repDate").textContent = gEndDate;
-          document.getElementById("repDuration").textContent = gDuration;
-          document.getElementById("repProd").textContent = gProduct;
-          document.getElementById("repVer").textContent = gVersion;
-          document.getElementById("repPType").textContent = gProcess;
-          gSearchString = "product=" + gProduct + "&version=" + gVersion +
-                          "&process_type=" + gProcess +
-                          "&date=>%3D" + gStartDate +"&date=<" + gEndDate;
-          document.getElementById("repSearch").href =
-              gSocorroPath + "search/?" + gSearchString;
-
-          processData();
-        }
-        else {
-          gEndDate = null;
-          displayMessage("ERROR - couldn't find crobtabber state!");
-        }
+      var repTime = new Date();
+      gEndDate = gDateNow ? makeDateTime(repTime) : makeDate(repTime);
+      repTime.setDate(repTime.getDate() - gDuration);
+      gStartDate = gDateNow ? makeDateTime(repTime) : makeDate(repTime);
+      document.getElementById("repDate").textContent = gDateNow ? "now" : gEndDate;
+      document.getElementById("repDateMode").textContent = gDateNow ? "up to" : "before";
+      document.getElementById("repDuration").textContent = gDuration;
+      document.getElementById("repProd").textContent = gProduct;
+      document.getElementById("repVer").textContent = gVersion;
+      document.getElementById("repPType").textContent = gProcess;
+      gSearchString = "product=" + gProduct + "&version=" + gVersion;
+      if (gProcess = "browser+content") {
+        gSearchString += "&process_type=browser&process_type=content";
       }
-    );
+      else {
+        gSearchString += "&process_type=" + gProcess;
+      }
+      gSearchString += "&date=>%3D" + encodeURIComponent(gStartDate) +
+                       "&date=<" + encodeURIComponent(gEndDate);
+      document.getElementById("repSearch").href =
+          gSocorroPath + "search/?" + gSearchString;
+
+      processData();
   //}
 }
 
@@ -429,6 +460,16 @@ function makeDate(aDate) {
   return aDate.getUTCFullYear() + "-" +
          (aDate.getUTCMonth() < 9 ? "0" : "") + (aDate.getUTCMonth() + 1 ) + "-" +
          (aDate.getUTCDate() < 10 ? "0" : "") + aDate.getUTCDate();
+}
+
+function makeDateTime(aDate) {
+  // Date + Time format is YYYY-MM-DD HH:mm
+  // Note that .getMonth() returns a number between 0 and 11 (0 for January)!
+  return aDate.getUTCFullYear() + "-" +
+         (aDate.getUTCMonth() < 9 ? "0" : "") + (aDate.getUTCMonth() + 1 ) + "-" +
+         (aDate.getUTCDate() < 10 ? "0" : "") + aDate.getUTCDate() + " " +
+         (aDate.getUTCHours() < 10 ? "0" : "") + aDate.getUTCHours() + ":" +
+         (aDate.getUTCMinutes() < 10 ? "0" : "") + aDate.getUTCMinutes();
 }
 
 function getParameterByName(aName) {
