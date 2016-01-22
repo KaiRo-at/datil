@@ -10,7 +10,7 @@ var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
 var gProduct = "Firefox", gVersion = "38.0b1", gProcess = "browser", gLimit = 10; //300;
-var gDate, gDuration = 7;
+var gStartDate, gEndDate, gDuration = 7, gSearchString;
 var gScores = {}, gSocorroAPIToken, gBugInfo = {};
 
 
@@ -40,18 +40,25 @@ window.onload = function() {
       function(aData) {
         if (aData) {
           var matviewTime = new Date(aData.state["signatures-matview"].last_success);
-          matviewTime.setDate(matviewTime.getDate() - 1); // subtract one day
-          gDate = makeDate(matviewTime);
-          document.getElementById("repDate").textContent = gDate;
+          //matviewTime.setDate(matviewTime.getDate() - 1); // subtract one day
+          gEndDate = makeDate(matviewTime);
+          matviewTime.setDate(matviewTime.getDate() - gDuration); // subtract one day
+          gStartDate = makeDate(matviewTime);
+          document.getElementById("repDate").textContent = gEndDate;
           document.getElementById("repDuration").textContent = gDuration;
           document.getElementById("repProd").textContent = gProduct;
           document.getElementById("repVer").textContent = gVersion;
           document.getElementById("repPType").textContent = gProcess;
+          gSearchString = "product=" + gProduct + "&version=" + gVersion +
+                          "&process_type=" + gProcess +
+                          "&date=>%3D" + gStartDate +"&date=<" + gEndDate;
+          document.getElementById("repSearch").href =
+              gSocorroPath + "search/?" + gSearchString;
 
           processData();
         }
         else {
-          gDate = null;
+          gEndDate = null;
           displayMessage("ERROR - couldn't find crobtabber state!");
         }
       }
@@ -62,17 +69,50 @@ window.onload = function() {
 function processData() {
   var tblBody = document.getElementById("scoreTBody");
   var fetchLimit = Math.round(gLimit * 1.5);
-  fetchFile(gSocorroPath + "api/TCBS/?product=" + gProduct + "&version=" + gVersion +
-            "&crash_type=" + gProcess + "&date_range_type=" + gDuration +
-            "&end_date=" + gDate + "&limit=" + fetchLimit, "json",
+  displayMessage("Requesting data…");
+  // Only return the signature facet, no "normal" results (crash IDs).
+  fetchFile(gSocorroPath + "api/SuperSearch/?_facets=signature&_results_number=0" +
+            "&" + gSearchString + "&_facets_size=" + fetchLimit +
+            "&_aggs.signature=is_garbage_collecting" +
+//            "&_histogram.uptime=signature&_histogram_interval.uptime=60" +
+            "&_aggs.signature=uptime" +
+            "&_aggs.signature=_cardinality.install_time", "json",
     function(aData) {
       if (aData) {
-        var resultCount = aData.crashes.length;
+        var resultCount = aData.facets.signature.length;
         displayMessage("Processing " + resultCount + " results (showing max. " + gLimit + ")…");
+        // Assemble data into a form we can use.
         for (var i = 0; i <= resultCount - 1; i++) {
-          gScores[aData.crashes[i].signature] = aData.crashes[i];
-          calcScore(aData.crashes[i].signature, function(aSignature) {
-            if (aSignature == aData.crashes[resultCount-1].signature) {
+          gScores[aData.facets.signature[i].term] = {
+            "count": aData.facets.signature[i].count,
+            "signature": aData.facets.signature[i].term,
+            "is_gc_count": 0,
+            "startup_count": 0,
+            "installations": aData.facets.signature[i].facets.cardinality_install_time.value,
+          };
+          // If we have entries in the GC facet, use the count for the true (T) value.
+          if (aData.facets.signature[i].facets.is_garbage_collecting.length) {
+            for (var j = 0; j <= aData.facets.signature[i].facets.is_garbage_collecting.length - 1; j++) {
+              if (aData.facets.signature[i].facets.is_garbage_collecting[j].term == "T") {
+                gScores[aData.facets.signature[i].term].is_gc_count =
+                  aData.facets.signature[i].facets.is_garbage_collecting[j].count;
+              }
+            }
+          }
+          // Loop through the uptime facet and sum up the values <60s.
+          if (aData.facets.signature[i].facets.uptime.length) {
+            for (var j = 0; j <= aData.facets.signature[i].facets.uptime.length - 1; j++) {
+              if (aData.facets.signature[i].facets.uptime[j].term < 60) {
+                gScores[aData.facets.signature[i].term].startup_count +=
+                  aData.facets.signature[i].facets.uptime[j].count;
+              }
+            }
+          }
+        }
+        // Actually calculate the scores.
+        for (var i = 0; i <= resultCount - 1; i++) {
+          calcScore(aData.facets.signature[i].term, function(aSignature) {
+            if (aSignature == aData.facets.signature[resultCount-1].term) {
               // last item, so all done with calculating
               buildDataTable();
               fetchBugs();
@@ -155,9 +195,7 @@ function buildDataTable() {
     cell.classList.add("sig");
     var link = cell.appendChild(document.createElement("a"));
     link.setAttribute("href",
-        gSocorroPath + "report/list?product=" + gProduct +
-        "&version=" + gProduct + ":" + gVersion +
-        "&range_unit=days&range_value=" + gDuration + "&date=" + gDate +
+        gSocorroPath + "signature?" + gSearchString +
         "&signature=" + encodeURIComponent(signature));
     link.textContent = signature;
     var cell = trow.appendChild(document.createElement("td"));
@@ -255,8 +293,8 @@ function displayReasons() {
 
       var startupInd = reasons.querySelector(".startup");
       startupInd.classList.add("increase");
-      startupInd.dataset["pct"] = parseInt(gScores[signature].startup_percent * 100);
-      startupInd.dataset["sextile"] = Math.floor(gScores[signature].startup_percent * 6);
+      startupInd.dataset["pct"] = parseInt(gScores[signature].startup_count / gScores[signature].count * 100);
+      startupInd.dataset["sextile"] = Math.floor(startupInd.dataset["pct"] * 6 / 100);
       startupInd.title = startupInd.dataset["pct"] + "% on startup (higher score)";
 
       var sdhangInd = reasons.querySelector(".shutdownhang");
@@ -301,7 +339,7 @@ function displayReasons() {
 function calcScore(aSignature, aCallback) {
   gScores[aSignature].score = gScores[aSignature].count;
   // Startup crashes: count each crash with factor 10
-  gScores[aSignature].score *= 1 + gScores[aSignature].startup_percent * (10 - 1);
+  gScores[aSignature].score *= 1 + gScores[aSignature].startup_count * (10 - 1) / gScores[aSignature].count;
   // shutdownhang: factor 1/2
   if (aSignature.startsWith("shutdownhang |")) {
     gScores[aSignature].score *= .5;
@@ -317,44 +355,26 @@ function calcScore(aSignature, aCallback) {
     gScores[aSignature].score *= 5;
   }
 
-  // Get signature Summary data
-  var sigRepTypes = "distinct_install";
-  var startDate = new Date(gDate);
-  startDate.setDate(startDate.getDate() - gDuration);
-  fetchFile(gSocorroPath + "api/SignatureSummary/?versions=" + gProduct + ":" + gVersion +
-            "&signature=" + encodeURIComponent(aSignature) +
-            "&report_types=" + sigRepTypes +
-            "&start_date=" + makeDate(startDate) + "&end_date=" + gDate, "json",
-    function(aData) {
-      if (aData && aData.reports) {
-        if (aData.reports.distinct_install && aData.reports.distinct_install.length) {
-          gScores[aSignature].installations = aData.reports.distinct_install[0].installations;
-          // installations: factor 0 for <3 installs
-          if (aData.reports.distinct_install[0].installations < 3) {
-            gScores[aSignature].score *= 0;
-          }
-          // installations: factor up to 2 for few people crashing over and over,
-          //                factor 1 for installations == crashes
-          // 1+e^(x*-3)*sin(x*pi)*3 - prototyped via http://www.mathe-fa.de/en
-          var instRatio = aData.reports.distinct_install[0].installations /
-                          aData.reports.distinct_install[0].crashes;
-          gScores[aSignature].score *= 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
-          gScores[aSignature].installations_factor = 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
-          gScores[aSignature].installations_ratio = instRatio;
-        }
-        else {
-          console.log("ERROR - no installation count present for " + aSignature + "!");
-        }
-      }
-      else {
-        console.log("ERROR - couldn't find Signature Summary data for " + aSignature + "!");
-      }
-      aCallback(aSignature);
-    }
-  );
+  // installations: factor 0 for <3 installs
+  if (gScores[aSignature].installations < 3) {
+    gScores[aSignature].score *= 0;
+  }
+  // installations: factor up to 2 for few people crashing over and over,
+  //                factor 1 for installations == crashes
+  // 1+e^(x*-3)*sin(x*pi)*3 - prototyped via http://www.mathe-fa.de/en
+  var instRatio = gScores[aSignature].installations / gScores[aSignature].count;
+  gScores[aSignature].score *= 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+  gScores[aSignature].installations_factor = 1 + 3 * Math.sin(instRatio * Math.PI) * Math.exp(instRatio * -3);
+  gScores[aSignature].installations_ratio = instRatio;
+
+  aCallback(aSignature);
 }
 
 function displayMessage(aErrorMessage) {
+  var msgRow = document.getElementById("message_row");
+  if (msgRow) {
+    msgRow.parentNode.removeChild(msgRow);
+  }
   var trow = document.getElementById("scoreTBody")
                      .appendChild(document.createElement('tr'));
   trow.setAttribute("id", "message_row");
