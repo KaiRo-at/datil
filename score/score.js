@@ -92,7 +92,7 @@ window.onload = function() {
       document.getElementById("repPType").textContent = gProcess;
       gSearchString = "product=" + gProduct + "&version=" + gVersion;
       if (gBuildID) {
-        gSearchString = "&build_id=" + gBuildID;
+        gSearchString += "&build_id=" + gBuildID;
       }
       if (gProcess = "browser+content") {
         gSearchString += "&process_type=browser&process_type=content";
