@@ -10,6 +10,7 @@ var gSocorroPath = "https://crash-stats.mozilla.com/";
 
 // Should select / figure out from https://crash-stats.mozilla.com/api/ProductsVersions/ or https://crash-stats.mozilla.com/api/CurrentVersions/
 var gProduct = "Firefox", gVersion = "44.0b1", gProcess = "browser", gLimit = 10; //300;
+var gBuildID = null;
 var gStartDate, gEndDate, gDuration = 7, gDateNow = false, gSearchString;
 var gScores = {}, gSocorroAPIToken, gBugInfo = {};
 
@@ -26,6 +27,10 @@ window.onload = function() {
   var ver = getParameterByName("version");
   if (ver.match(/^(\d+\.)+[\dab]+$/)) {
     gVersion = ver;
+  }
+  var buildid = getParameterByName("buildid");
+  if (buildid.match(/^(\d+)+$/)) {
+    gBuildID = buildid;
   }
   var limit = getParameterByName("limit");
   if (limit.match(/^(\d+)+$/) && (limit >= 3) && (limit <= 1000)) {
@@ -80,8 +85,15 @@ window.onload = function() {
       document.getElementById("repDuration").textContent = gDuration;
       document.getElementById("repProd").textContent = gProduct;
       document.getElementById("repVer").textContent = gVersion;
+      if (gBuildID) {
+        document.getElementById("repBuildID").textContent = gBuildID;
+        document.getElementById("repBIDcontainer").style.display = "initial";
+      }
       document.getElementById("repPType").textContent = gProcess;
       gSearchString = "product=" + gProduct + "&version=" + gVersion;
+      if (gBuildID) {
+        gSearchString = "&build_id=" + gBuildID;
+      }
       if (gProcess = "browser+content") {
         gSearchString += "&process_type=browser&process_type=content";
       }
