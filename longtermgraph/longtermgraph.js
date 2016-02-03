@@ -87,7 +87,7 @@ var gBranches = {
     maxRate: 11,
     maxRate_office: 5,
     maxCrashes: 1e3,
-    maxADI: 120e3,
+    maxADI: 2e5,
   },
   andaurora: {
     title: "Firefox for Android Aurora channel",
