@@ -24,6 +24,8 @@ var gBranches = {
     sumContent: true,
     maxRate: 3,
     maxRate_office: 1.5,
+    maxRate_browser: 1.5,
+    maxRate_plugin: 0.2,
     maxCrashes: 2.2e6,
     maxADI: 130e6,
   },
@@ -36,6 +38,7 @@ var gBranches = {
     content: true,
     sumContent: true,
     maxRate: 4,
+    maxRate_plugin: 0.3,
     maxCrashes: 80e3,
     maxADI: 3.5e6,
   },
@@ -48,6 +51,7 @@ var gBranches = {
     content: true,
     sumContent: true,
     maxRate: 10,
+    maxRate_plugin: 0.9,
     maxCrashes: 5e3,
     maxADI: 180e3,
   },
@@ -60,6 +64,7 @@ var gBranches = {
     content: true,
     sumContent: true,
     maxRate: 30,
+    maxRate_plugin: 5,
     maxCrashes: 15e3,
     maxADI: 140e3,
   },
@@ -73,6 +78,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 4,
     maxRate_office: 2.5,
+    maxRate_browser: 2.5,
     maxCrashes: 100e3,
     maxADI: 6e6,
   },
@@ -86,6 +92,7 @@ var gBranches = {
     sumContent: false,
     maxRate: 11,
     maxRate_office: 5,
+    maxRate_browser: 5,
     maxCrashes: 1e3,
     maxADI: 2e5,
   },
@@ -271,17 +278,21 @@ function graphData(aData) {
       var crUnit = (gBranches[gSelID].maxADI > 1e6) ? "M" : "k";
       var crUnitNum = (gBranches[gSelID].maxADI > 1e6) ? 1e6 : 1e3;
       var yAxisMax = gBranches[gSelID].maxADI / crUnitNum;
-      var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+    }
+    else if (gUseADI) {
+      var crUnit = "";
+      var crUnitNum = 1;
+      var yAxisMax = gBranches[gSelID].maxRate;
+      if (gType && gBranches[gSelID]["maxRate_" + gType]) {
+        yAxisMax = gBranches[gSelID]["maxRate_" + gType];
+      }
     }
     else {
       var crUnit = (gBranches[gSelID].maxCrashes > 1e6) ? "M" : "k";
       var crUnitNum = (gBranches[gSelID].maxCrashes > 1e6) ? 1e6 : 1e3;
-      var yAxisMax = gUseADI ? gBranches[gSelID].maxRate : gBranches[gSelID].maxCrashes / crUnitNum;
-      if (gUseADI && gType && gBranches[gSelID]["maxRate_" + gType]) {
-        yAxisMax = gBranches[gSelID]["maxRate_" + gType];
-      }
-      var yAxisDecimals = (yAxisMax > 20) ? 0 : 1;
+      var yAxisMax = gBranches[gSelID].maxCrashes / crUnitNum;
     }
+    var yAxisDecimals = (yAxisMax > 20) ? 0 : ((yAxisMax > 1) ? 1 : 2);
     // Add elements in the following format: [ new Date("2009-07-12"), 100, 200 ]
     if (gCategoryGraph) {
       // Match the field name for the total - for plugins, we take only crashes, not hangs.
