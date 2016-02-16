@@ -8,7 +8,8 @@ var gBody, gGraph, gSelID,
     gBranchSelect, gADICheckbox, gCombineBrowserCheckbox,
     gDataIssueDays, gRawData, gMinDay, gType,
     gUseADI = true, gCombineBrowser = true, gADIGraph = false,
-    gCategoryGraph = false, gCategoryProcess = "browser", gCatData;
+    gCategoryGraph = false, gCategoryProcess = "browser", gCatData,
+    gESData = false;
 
 // For debugging/development, this is run on localhost.
 var gDataPath = (location.hostname == "localhost") ? "../socorro/" : "../../";
@@ -17,6 +18,7 @@ var gBranches = {
   fxrel: {
     title: "Firefox release channel",
     datafile: "Firefox-release-bytype.json",
+    bytypefile: "Firefox-release-crashes-bytype.json",
     annotationfile: "Firefox-release-annotations.json",
     countsfile: "Firefox-release-counts.json",
     plugins: true,
@@ -32,6 +34,7 @@ var gBranches = {
   fxbeta: {
     title: "Firefox beta channel",
     datafile: "Firefox-beta-bytype.json",
+    bytypefile: "Firefox-beta-crashes-bytype.json",
     annotationfile: "Firefox-beta-annotations.json",
     countsfile: "Firefox-beta-counts.json",
     plugins: true,
@@ -45,6 +48,7 @@ var gBranches = {
   fxaurora: {
     title: "Firefox Aurora / DevEdition channel",
     datafile: "Firefox-aurora-bytype.json",
+    bytypefile: "Firefox-aurora-crashes-bytype.json",
     annotationfile: "Firefox-aurora-annotations.json",
     countsfile: "Firefox-aurora-counts.json",
     plugins: true,
@@ -58,6 +62,7 @@ var gBranches = {
   fxnightly: {
     title: "Firefox Nightly channel",
     datafile: "Firefox-nightly-bytype.json",
+    bytypefile: "Firefox-nightly-crashes-bytype.json",
     annotationfile: "Firefox-nightly-annotations.json",
     countsfile: "Firefox-nightly-counts.json",
     plugins: true,
@@ -71,6 +76,7 @@ var gBranches = {
   andrel: {
     title: "Firefox for Android release channel",
     datafile: "FennecAndroid-release-bytype.json",
+    bytypefile: "FennecAndroid-release-crashes-bytype.json",
     annotationfile: "FennecAndroid-release-annotations.json",
     countsfile: "FennecAndroid-release-counts.json",
     plugins: false,
@@ -85,6 +91,7 @@ var gBranches = {
   andbeta: {
     title: "Firefox for Android beta channel",
     datafile: "FennecAndroid-beta-bytype.json",
+    bytypefile: "FennecAndroid-beta-crashes-bytype.json",
     annotationfile: "FennecAndroid-beta-annotations.json",
     countsfile: "FennecAndroid-beta-counts.json",
     plugins: false,
@@ -99,6 +106,7 @@ var gBranches = {
   andaurora: {
     title: "Firefox for Android Aurora channel",
     datafile: "FennecAndroid-aurora-bytype.json",
+    bytypefile: "FennecAndroid-aurora-crashes-bytype.json",
     annotationfile: "FennecAndroid-aurora-annotations.json",
     countsfile: "FennecAndroid-aurora-counts.json",
     plugins: false,
@@ -111,6 +119,7 @@ var gBranches = {
   andnightly: {
     title: "Firefox for Android Nightly channel",
     datafile: "FennecAndroid-nightly-bytype.json",
+    bytypefile: "FennecAndroid-nightly-crashes-bytype.json",
     annotationfile: "FennecAndroid-nightly-annotations.json",
     countsfile: "FennecAndroid-nightly-counts.json",
     plugins: false,
@@ -130,7 +139,8 @@ window.onload = function() {
   gBranchSelect.onchange = function() {
     location.href = "?" + gBranchSelect.value +
                     (gADIGraph ? "-blp" :
-                      (gCategoryGraph ? "-" + gCategoryProcess.charAt(0) + "cat" : ""));
+                      (gCategoryGraph ? "-" + gCategoryProcess.charAt(0) + "cat" : "")) +
+                    (gESData ? "&source=es" : "");
   }
   var option;
   for (var branchID in gBranches) {
@@ -151,6 +161,7 @@ window.onload = function() {
     gCombineBrowser = gCombineBrowserCheckbox.checked;
     graphData(gRawData);
   }
+  gESData = (getParameterByName("source") == "es");
 
   // See if there is a notification and if so, display it.
   fetchFile("notification.txt", "",
@@ -168,35 +179,40 @@ window.onload = function() {
 
   if (location.search) {
     var urlAnchor = location.search.substr(1); // Cut off the ? sign.
-    var urlAParts = urlAnchor.split("-");
-    if (urlAParts.length > 1) {
-      if (urlAParts[1] == "blp") {
-        gADIGraph = true;
-        gUseADI = false; // This turns on the usage of units like 'M' and 'k'.
-        document.getElementsByTagName("h1")[0].textContent = "BLP History";
-        document.title = "BLP History";
-        document.getElementById("selectorsubline").hidden = true;
-      }
-      else if (urlAParts[1] == "bcat") {
-        gCategoryGraph = true;
-        gCategoryProcess = "browser";
-        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
-        document.title += " - Categories (" + gCategoryProcess + ")";
-        gType = gCategoryProcess;
-      }
-      else if (urlAParts[1] == "ccat") {
-        gCategoryGraph = true;
-        gCategoryProcess = "content";
-        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
-        document.title += " - Categories (" + gCategoryProcess + ")";
-        gType = gCategoryProcess;
-      }
-      else if (urlAParts[1] == "pcat") {
-        gCategoryGraph = true;
-        gCategoryProcess = "plugin";
-        document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
-        document.title += " - Categories (" + gCategoryProcess + ")";
-        gType = gCategoryProcess;
+    var urlPParts = urlAnchor.split("&");
+    var urlAParts = urlPParts[0].split("-");
+    if (urlAParts.length) {
+      if (urlAParts.length > 1) {
+        switch (urlAParts[1]) {
+          case "blp":
+            gADIGraph = true;
+            gUseADI = false; // This turns on the usage of units like 'M' and 'k'.
+            document.getElementsByTagName("h1")[0].textContent = "BLP History";
+            document.title = "BLP History";
+            document.getElementById("selectorsubline").hidden = true;
+            break;
+          case "bcat":
+            gCategoryGraph = true;
+            gCategoryProcess = "browser";
+            document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+            document.title += " - Categories (" + gCategoryProcess + ")";
+            gType = gCategoryProcess;
+            break;
+          case "ccat":
+            gCategoryGraph = true;
+            gCategoryProcess = "content";
+            document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+            document.title += " - Categories (" + gCategoryProcess + ")";
+            gType = gCategoryProcess;
+            break;
+          case "pcat":
+            gCategoryGraph = true;
+            gCategoryProcess = "plugin";
+            document.getElementsByTagName("h1")[0].textContent += " - Categories (" + gCategoryProcess + " process)";
+            document.title += " - Categories (" + gCategoryProcess + ")";
+            gType = gCategoryProcess;
+            break;
+        }
       }
       urlAnchor = urlAParts[0];
     }
@@ -241,7 +257,7 @@ window.onload = function() {
         if (aData) {
           gCatData = aData;
           // Call this from here so we make sure all data is loaded.
-          fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
+          fetchFile(getFileName("bytype"), "json", graphData);
         }
         else {
           console.log("Error loading category counts.");
@@ -252,7 +268,7 @@ window.onload = function() {
     );
   }
   else {
-    fetchFile(gDataPath + gBranches[gSelID].datafile, "json", graphData);
+    fetchFile(getFileName("bytype"), "json", graphData);
   }
 }
 
@@ -550,4 +566,24 @@ function fetchFile(aURL, aFormat, aCallback) {
   catch (e) {
     aCallback(null);
   }
+}
+
+function getFileName(aFileType) {
+  switch (aFileType) {
+    case "bytype":
+      return gESData ? gDataPath + gBranches[gSelID].bytypefile
+                     : gDataPath + gBranches[gSelID].datafile;
+    case "annotations":
+      return gDataPath + gBranches[gSelID].annotationfile;
+    case "counts":
+      return gDataPath + gBranches[gSelID].countsfile;
+  }
+}
+
+function getParameterByName(aName) {
+  // from http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  name = aName.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
