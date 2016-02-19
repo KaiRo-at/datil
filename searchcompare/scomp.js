@@ -8,7 +8,7 @@ var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
-var gSearch1, gSearch2, gLimit = 30; //300;
+var gSearch1, gSearch2, gLimit = 10, gFetchLimit = 300;
 var gSigData = {}, gSocorroAPIToken, gBugInfo = {};
 
 
@@ -25,6 +25,14 @@ window.onload = function() {
   searchCommon = getParameterByName("common");
   searchParam1 = getParameterByName("p1");
   searchParam2 = getParameterByName("p2");
+  var limit = getParameterByName("limit");
+  if (limit.match(/^(\d+)+$/) && (limit >= 3) && (limit <= 1000)) {
+    gLimit = limit;
+  }
+  var flimit = getParameterByName("fetchlimit");
+  if (flimit.match(/^(\d+)+$/) && (flimit >= 3) && (flimit <= 1000)) {
+    gFetchLimit = flimit;
+  }
 
   gSearch1 = searchCommon + (searchParam1 ? "&" + searchParam1 : "");
   gSearch2 = searchCommon + (searchParam2 ? "&" + searchParam2 : "");
@@ -44,18 +52,17 @@ window.onload = function() {
 
 function processData() {
   var tblBody = document.getElementById("scompTBody");
-  var fetchLimit = gLimit * 5;
   displayMessage("Requesting data for first search…");
   // Only return the signature facet, no "normal" results (crash IDs).
   fetchFile(gSocorroPath + "api/SuperSearch/?_facets=signature&_results_number=0" +
-            "&" + gSearch1 + "&_facets_size=" + fetchLimit, "json",
+            "&" + gSearch1 + "&_facets_size=" + gFetchLimit, "json",
     function(aData1) {
       if (aData1) {
         var result1 = aData1.facets.signature;
         var total1 = aData1.total;
         displayMessage("Requesting data for second search…");
         fetchFile(gSocorroPath + "api/SuperSearch/?_facets=signature&_results_number=0" +
-                  "&" + gSearch2 + "&_facets_size=" + fetchLimit, "json",
+                  "&" + gSearch2 + "&_facets_size=" + gFetchLimit, "json",
           function(aData2) {
             if (aData2) {
               var result2 = aData2.facets.signature;

@@ -37,6 +37,11 @@ th {
   text-align: left;
 }
 
+.rank {
+  text-align: right;
+  vertical-align: middle;
+}
+
 .sig {
   font-size: small;
   text-align: left;
@@ -67,6 +72,8 @@ th {
 }
 
 .pctcmp {
+  text-align: right;
+  vertical-align: middle;
   color: gray;
 }
 
