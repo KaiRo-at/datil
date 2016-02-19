@@ -8,7 +8,7 @@ var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
-var gSearch1, gSearch2, gLimit = 20, gFetchLimit = 300;
+var gSearchBase, gSearch1, gSearch2, gLimit = 20, gFetchLimit = 300;
 var gSigData = {}, gSocorroAPIToken, gBugInfo = {};
 
 
@@ -36,6 +36,7 @@ window.onload = function() {
 
   gSearch1 = searchCommon + (searchParam1 ? "&" + searchParam1 : "");
   gSearch2 = searchCommon + (searchParam2 ? "&" + searchParam2 : "");
+  gSearchBase = searchCommon;
 
   document.getElementById("search1link").href =
       gSocorroPath + "search/?" + gSearch1;
@@ -179,7 +180,7 @@ function buildDataTable() {
     cell.classList.add("sig");
     var link = cell.appendChild(document.createElement("a"));
     link.setAttribute("href",
-        gSocorroPath + "signature?" + gSearch1 +
+        gSocorroPath + "signature?" + gSearchBase +
         "&signature=" + encodeURIComponent(signature));
     link.textContent = signature;
     var cell = trow.appendChild(document.createElement("td"));
