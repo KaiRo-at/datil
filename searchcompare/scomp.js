@@ -8,7 +8,7 @@ var gBzAPIPath = "https://bugzilla.mozilla.org/bzapi/";
 var gBzBasePath = "https://bugzilla.mozilla.org/";
 var gSocorroPath = "https://crash-stats.mozilla.com/";
 
-var gSearch1, gSearch2, gLimit = 10, gFetchLimit = 300;
+var gSearch1, gSearch2, gLimit = 20, gFetchLimit = 300;
 var gSigData = {}, gSocorroAPIToken, gBugInfo = {};
 
 
