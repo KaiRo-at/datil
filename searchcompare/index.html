@@ -12,9 +12,29 @@
 </head>
 <body>
 <h1>Super Search Comparison</h1>
+<form>
+<table id="scompParams" class="hidden">
+<tr>
+<td colspan="2">Common parameters:
+<br><input type="text" name="common" id="paramCommon" class="paramInput"></td>
+</tr>
+<tr>
+<td>Specific params for search #1:
+<br><input type="text" name="p1" id="paramS1" class="paramInput"></td>
+<td>Specific params for search #2:
+<br><input type="text" name="p2" id="paramS2" class="paramInput"></td>
+</tr>
+<tr>
+<td colspan="2" class="paramSubmit"><input type="submit"></td>
+</tr>
+</table>
+</form>
+
+<div id="scompResult">
 <p id="dataLine">Comparing
 <a href="" id="search1link">search #1</a> to
-<a href="" id="search2link">search #2</a>.</p>
+<a href="" id="search2link">search #2</a>.
+<a href="#" id="searchParamToggle">[edit]</a></p>
 
 <table border="1">
 <thead id="scompTHeader">
@@ -22,7 +42,7 @@
 <tbody id="scompTBody">
 </tbody>
 </table>
-
+</div>
 
 <div id="footer">
 If interested,

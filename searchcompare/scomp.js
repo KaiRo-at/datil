@@ -14,14 +14,6 @@ var gSigData = {}, gSocorroAPIToken, gBugInfo = {};
 
 window.onload = function() {
   gSocorroAPIToken = getParameterByName("token");
-  /*
-  searchCommon = "product=Firefox&version=46.0a2&process_type=browser&process_type=content";
-  searchParam1 = "dom_ipc_enabled=__null__";
-  searchParam2 = "dom_ipc_enabled=!__null__";
-  console.log("?common=" + encodeURIComponent(searchCommon) +
-              "&p1=" + encodeURIComponent(searchParam1) +
-              "&p2=" + encodeURIComponent(searchParam2));
-  */
   searchCommon = getParameterByName("common");
   searchParam1 = getParameterByName("p1");
   searchParam2 = getParameterByName("p2");
@@ -38,6 +30,9 @@ window.onload = function() {
   gSearch2 = searchCommon + (searchParam2 ? "&" + searchParam2 : "");
   gSearchBase = searchCommon;
 
+  document.getElementById("paramCommon").value = searchCommon;
+  document.getElementById("paramS1").value = searchParam1;
+  document.getElementById("paramS2").value = searchParam2;
   document.getElementById("search1link").href =
       gSocorroPath + "search/?" + gSearch1;
   document.getElementById("search2link").href =
@@ -47,7 +42,19 @@ window.onload = function() {
     processData();
   }
   else {
-    displayMessage("ERROR: No parameters given.");
+    document.getElementById("scompParams").classList.remove("hidden");
+    document.getElementById("scompResult").classList.add("hidden");
+  }
+
+  document.getElementById("searchParamToggle").onclick = function() {
+    var paramArea = document.getElementById("scompParams");
+    if (paramArea.classList.contains("hidden")) {
+      paramArea.classList.remove("hidden");
+    }
+    else {
+      paramArea.classList.add("hidden");
+    }
+    return false;
   }
 }
 
