@@ -17,6 +17,7 @@ var gDataPath = (location.hostname == "localhost") ? "../socorro/" : "../../";
 var gBranches = {
   fxrel: {
     title: "Firefox release channel",
+    shorttitle: "Firefox release",
     datafile: "Firefox-release-bytype.json",
     bytypefile: "Firefox-release-crashes-bytype.json",
     annotationfile: "Firefox-release-annotations.json",
@@ -33,6 +34,7 @@ var gBranches = {
   },
   fxbeta: {
     title: "Firefox beta channel",
+    shorttitle: "Firefox beta",
     datafile: "Firefox-beta-bytype.json",
     bytypefile: "Firefox-beta-crashes-bytype.json",
     annotationfile: "Firefox-beta-annotations.json",
@@ -47,6 +49,7 @@ var gBranches = {
   },
   fxaurora: {
     title: "Firefox Aurora / DevEdition channel",
+    shorttitle: "Developer Edition",
     datafile: "Firefox-aurora-bytype.json",
     bytypefile: "Firefox-aurora-crashes-bytype.json",
     annotationfile: "Firefox-aurora-annotations.json",
@@ -61,6 +64,7 @@ var gBranches = {
   },
   fxnightly: {
     title: "Firefox Nightly channel",
+    shorttitle: "Nightly",
     datafile: "Firefox-nightly-bytype.json",
     bytypefile: "Firefox-nightly-crashes-bytype.json",
     annotationfile: "Firefox-nightly-annotations.json",
@@ -75,6 +79,7 @@ var gBranches = {
   },
   andrel: {
     title: "Firefox for Android release channel",
+    shorttitle: "Android release",
     datafile: "FennecAndroid-release-bytype.json",
     bytypefile: "FennecAndroid-release-crashes-bytype.json",
     annotationfile: "FennecAndroid-release-annotations.json",
@@ -90,6 +95,7 @@ var gBranches = {
   },
   andbeta: {
     title: "Firefox for Android beta channel",
+    shorttitle: "Android beta",
     datafile: "FennecAndroid-beta-bytype.json",
     bytypefile: "FennecAndroid-beta-crashes-bytype.json",
     annotationfile: "FennecAndroid-beta-annotations.json",
@@ -105,6 +111,7 @@ var gBranches = {
   },
   andaurora: {
     title: "Firefox for Android Aurora channel",
+    shorttitle: "Android Aurora",
     datafile: "FennecAndroid-aurora-bytype.json",
     bytypefile: "FennecAndroid-aurora-crashes-bytype.json",
     annotationfile: "FennecAndroid-aurora-annotations.json",
@@ -118,6 +125,7 @@ var gBranches = {
   },
   andnightly: {
     title: "Firefox for Android Nightly channel",
+    shorttitle: "Android Nightly",
     datafile: "FennecAndroid-nightly-bytype.json",
     bytypefile: "FennecAndroid-nightly-crashes-bytype.json",
     annotationfile: "FennecAndroid-nightly-annotations.json",
@@ -443,8 +451,9 @@ function graphData(aData) {
         colors.push("#FFCC00");
       }
     }
+    if (gType == "office") { document.getElementsByTagName("h1")[0].classList.add("hidden"); }
     var graphOptions = {
-      title: gBranches[gSelID].title,
+      title: gType == "office" ? "Crash Rates: " + gBranches[gSelID].shorttitle : gBranches[gSelID].title,
       ylabel: gADIGraph ? "BLP" : (gUseADI ? "submitted crashes / 100 ADI" : "submitted crashes"),
       valueRange: [0, yAxisMax + .01],
       axes: {
