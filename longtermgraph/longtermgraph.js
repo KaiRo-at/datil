@@ -91,7 +91,7 @@ var gBranches = {
     maxRate_office: 2.5,
     maxRate_browser: 2.5,
     maxCrashes: 100e3,
-    maxADI: 6e6,
+    maxADI: 8e6,
   },
   andbeta: {
     title: "Firefox for Android beta channel",
