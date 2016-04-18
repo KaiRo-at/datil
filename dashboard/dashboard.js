@@ -118,14 +118,40 @@ var gSources = {
     getValue: function(aProd, aChannel, aCallback, aCBData) {
       fetchFile(this.getDataFile(aProd, aChannel), "json",
           function(aData) {
-            if (!aData || !aData[gDay] || !aData[gDay].versions)
+            if (!aData || !aData[gDay] || !aData[gDay].versions) {
               aCallback(null, aCBData);
-            else
-              aCallback(aData[gDay].versions[0] +
-                        (aData[gDay].versions.length > 1
-                             ? " - " + aData[gDay].versions[aData[gDay].versions.length - 1]
-                             : ""),
-                        aCBData);
+            }
+            else {
+              var verstring = "";
+              if (aData[gDay].versions.length == 1) {
+                verstring = aData[gDay].versions[0];
+              }
+              else if (aData[gDay].versions.length > 1) {
+                // Sort versions in a "correct" way and then take first and last.
+                var betaRe = /^([\d+\.]+)b(\d+)$/;
+                aData[gDay].versions.sort(
+                  function (a, b) {
+                    var aParts = a.match(betaRe);
+                    var bParts = b.match(betaRe);
+                    if (aParts && bParts) {
+                      // special-case comparison for betas
+                      if (aParts[1] == bParts[1]) {
+                        // look at part behind the "b"
+                        return Math.sign(aParts[2] - bParts[2]);
+                      }
+                      return aParts[1] > bParts[1] ? 1 : -1;
+                    }
+                    if (a > b) { return 1; }
+                    if (a < b) { return -1; }
+                    // a must be equal to b
+                    return 0;
+                  }
+                )
+                verstring = aData[gDay].versions[0] + " - " +
+                            aData[gDay].versions[aData[gDay].versions.length - 1];
+              }
+              aCallback(verstring, aCBData);
+            }
           }
       );
     },
