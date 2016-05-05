@@ -18,10 +18,7 @@ var gBranches = {
   fxrel: {
     title: "Firefox release channel",
     shorttitle: "Firefox release",
-    datafile: "Firefox-release-bytype.json",
-    bytypefile: "Firefox-release-crashes-bytype.json",
-    annotationfile: "Firefox-release-annotations.json",
-    countsfile: "Firefox-release-counts.json",
+    filenamebase: "Firefox-release-",
     plugins: true,
     content: false,
     sumContent: true,
@@ -35,10 +32,7 @@ var gBranches = {
   fxbeta: {
     title: "Firefox beta channel",
     shorttitle: "Firefox beta",
-    datafile: "Firefox-beta-bytype.json",
-    bytypefile: "Firefox-beta-crashes-bytype.json",
-    annotationfile: "Firefox-beta-annotations.json",
-    countsfile: "Firefox-beta-counts.json",
+    filenamebase: "Firefox-beta-",
     plugins: true,
     content: true,
     sumContent: true,
@@ -50,10 +44,7 @@ var gBranches = {
   fxaurora: {
     title: "Firefox Aurora / DevEdition channel",
     shorttitle: "Developer Edition",
-    datafile: "Firefox-aurora-bytype.json",
-    bytypefile: "Firefox-aurora-crashes-bytype.json",
-    annotationfile: "Firefox-aurora-annotations.json",
-    countsfile: "Firefox-aurora-counts.json",
+    filenamebase: "Firefox-aurora-",
     plugins: true,
     content: true,
     sumContent: true,
@@ -65,10 +56,7 @@ var gBranches = {
   fxnightly: {
     title: "Firefox Nightly channel",
     shorttitle: "Nightly",
-    datafile: "Firefox-nightly-bytype.json",
-    bytypefile: "Firefox-nightly-crashes-bytype.json",
-    annotationfile: "Firefox-nightly-annotations.json",
-    countsfile: "Firefox-nightly-counts.json",
+    filenamebase: "Firefox-nightly-",
     plugins: true,
     content: true,
     sumContent: true,
@@ -80,10 +68,7 @@ var gBranches = {
   andrel: {
     title: "Firefox for Android release channel",
     shorttitle: "Android release",
-    datafile: "FennecAndroid-release-bytype.json",
-    bytypefile: "FennecAndroid-release-crashes-bytype.json",
-    annotationfile: "FennecAndroid-release-annotations.json",
-    countsfile: "FennecAndroid-release-counts.json",
+    filenamebase: "FennecAndroid-release-",
     plugins: false,
     content: false,
     sumContent: false,
@@ -96,10 +81,7 @@ var gBranches = {
   andbeta: {
     title: "Firefox for Android beta channel",
     shorttitle: "Android beta",
-    datafile: "FennecAndroid-beta-bytype.json",
-    bytypefile: "FennecAndroid-beta-crashes-bytype.json",
-    annotationfile: "FennecAndroid-beta-annotations.json",
-    countsfile: "FennecAndroid-beta-counts.json",
+    filenamebase: "FennecAndroid-beta-",
     plugins: false,
     content: false,
     sumContent: false,
@@ -112,10 +94,7 @@ var gBranches = {
   andaurora: {
     title: "Firefox for Android Aurora channel",
     shorttitle: "Android Aurora",
-    datafile: "FennecAndroid-aurora-bytype.json",
-    bytypefile: "FennecAndroid-aurora-crashes-bytype.json",
-    annotationfile: "FennecAndroid-aurora-annotations.json",
-    countsfile: "FennecAndroid-aurora-counts.json",
+    filenamebase: "FennecAndroid-aurora-",
     plugins: false,
     content: false,
     sumContent: false,
@@ -126,10 +105,7 @@ var gBranches = {
   andnightly: {
     title: "Firefox for Android Nightly channel",
     shorttitle: "Android Nightly",
-    datafile: "FennecAndroid-nightly-bytype.json",
-    bytypefile: "FennecAndroid-nightly-crashes-bytype.json",
-    annotationfile: "FennecAndroid-nightly-annotations.json",
-    countsfile: "FennecAndroid-nightly-counts.json",
+    filenamebase: "FennecAndroid-nightly-",
     plugins: false,
     content: false,
     sumContent: false,
@@ -260,7 +236,7 @@ window.onload = function() {
   );
   if (gCategoryGraph) {
     document.getElementById("combineoption").hidden = true;
-    fetchFile(gDataPath + gBranches[gSelID].countsfile, "json",
+    fetchFile(getFileName("categories"), "json",
       function(aData) {
         if (aData) {
           gCatData = aData;
@@ -324,43 +300,43 @@ function graphData(aData) {
                        gCategoryProcess.charAt(0).toUpperCase() + gCategoryProcess.slice(1);
       for (var day in gCatData) {
         dataArray = [ new Date(day) ];
-        if (aData[day].crashes[totalField]) {
+        if (aData[day] && aData[day].crashes[totalField]) {
           dataArray.push(aData[day].crashes[totalField] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day].startup && gCatData[day].startup[gCategoryProcess]) {
+        if (aData[day] && gCatData[day].startup && gCatData[day].startup[gCategoryProcess]) {
           dataArray.push(gCatData[day].startup[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day].oom && gCatData[day].oom[gCategoryProcess]) {
+        if (aData[day] && gCatData[day].oom && gCatData[day].oom[gCategoryProcess]) {
           dataArray.push(gCatData[day].oom[gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day]["oom:small"] && gCatData[day]["oom:small"][gCategoryProcess]) {
+        if (aData[day] && gCatData[day]["oom:small"] && gCatData[day]["oom:small"][gCategoryProcess]) {
           dataArray.push(gCatData[day]["oom:small"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day]["oom:large"] && gCatData[day]["oom:large"][gCategoryProcess]) {
+        if (aData[day] && gCatData[day]["oom:large"] && gCatData[day]["oom:large"][gCategoryProcess]) {
           dataArray.push(gCatData[day]["oom:large"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day]["address:pure"] && gCatData[day]["address:pure"][gCategoryProcess]) {
+        if (aData[day] && gCatData[day]["address:pure"] && gCatData[day]["address:pure"][gCategoryProcess]) {
           dataArray.push(gCatData[day]["address:pure"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
           dataArray.push(0);
         }
-        if (gCatData[day]["address:file"] && gCatData[day]["address:file"][gCategoryProcess]) {
+        if (aData[day] && gCatData[day]["address:file"] && gCatData[day]["address:file"][gCategoryProcess]) {
           dataArray.push(gCatData[day]["address:file"][gCategoryProcess] * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
         }
         else {
@@ -368,7 +344,7 @@ function graphData(aData) {
         }
         if (gCategoryProcess == "browser") {
           // Those do not make sense in other processes.
-          if (gCatData[day].shutdownhang) {
+          if (aData[day] && gCatData[day].shutdownhang) {
             dataArray.push(gCatData[day].shutdownhang * (gUseADI ? (100 / aData[day].adi) : 1 / crUnitNum));
           }
           else {
@@ -490,7 +466,7 @@ function graphData(aData) {
 
     gGraph = new Dygraph(graphDiv, graphData, graphOptions);
     gGraph.ready(function() {
-      fetchFile(gDataPath + gBranches[gSelID].annotationfile, "json",
+      fetchFile(getFileName("annotations"), "json",
         function(aData) {
           if (aData) {
             for (var i = 0; i < aData.length; i++) {
@@ -580,12 +556,13 @@ function fetchFile(aURL, aFormat, aCallback) {
 function getFileName(aFileType) {
   switch (aFileType) {
     case "bytype":
-      return gESData ? gDataPath + gBranches[gSelID].bytypefile
-                     : gDataPath + gBranches[gSelID].datafile;
+      return gDataPath + gBranches[gSelID].filenamebase +
+                         (gESData ? "crashes-bytype.json" : "bytype.json")
+    case "categories":
+      return gDataPath + gBranches[gSelID].filenamebase +
+                         (gESData ? "crashes-categories.json" : "counts.json")
     case "annotations":
-      return gDataPath + gBranches[gSelID].annotationfile;
-    case "counts":
-      return gDataPath + gBranches[gSelID].countsfile;
+      return gDataPath + gBranches[gSelID].filenamebase + "annotations.json"
   }
 }
 
