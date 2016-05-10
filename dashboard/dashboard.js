@@ -110,7 +110,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -176,7 +176,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -202,7 +202,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return gGraphBasePath + "?" +
@@ -237,7 +237,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -269,7 +269,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -301,10 +301,10 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getCategoryFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-counts.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-categories.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return gGraphBasePath + "?" +
@@ -346,7 +346,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;
@@ -378,7 +378,7 @@ var gSources = {
                                                 : aProd.channels[aChannel].name);
     },
     getDataFile: function(aProd, aChannel) {
-      return gAnalysisPath + aProd.full + "-" + aChannel + "-bytype.json";
+      return gAnalysisPath + aProd.full + "-" + aChannel + "-crashes-bytype.json";
     },
     getLinkURL: function(aProd, aChannel) {
       return false;

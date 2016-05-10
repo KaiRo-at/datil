@@ -124,7 +124,7 @@ window.onload = function() {
     location.href = "?" + gBranchSelect.value +
                     (gADIGraph ? "-blp" :
                       (gCategoryGraph ? "-" + gCategoryProcess.charAt(0) + "cat" : "")) +
-                    (gESData ? "&source=es" : "");
+                    (gESData ? "&source=pg" : "");
   }
   var option;
   for (var branchID in gBranches) {
@@ -145,7 +145,7 @@ window.onload = function() {
     gCombineBrowser = gCombineBrowserCheckbox.checked;
     graphData(gRawData);
   }
-  gESData = (getParameterByName("source") == "es");
+  gESData = (getParameterByName("source") != "pg");
 
   // See if there is a notification and if so, display it.
   fetchFile("notification.txt", "",
