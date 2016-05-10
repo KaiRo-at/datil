@@ -12,4 +12,4 @@ Currently, the following dashboards/tools are part of Datil:
 * [score](score/README.md): weighted top crash lists by calculating an "importance" score for every signature
 * [searchcompare](searchcompare/README.md): compare two Socorro Super Search queries
 
-See the separate READMEs liunked from the dashboard/tool names for more details and usage instructions!
+See the separate READMEs linked from the dashboard/tool names for more details and usage instructions!
