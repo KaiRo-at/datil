@@ -26,16 +26,16 @@ The tool supports a number of parameters:
 ## Examples
 
 * https://crash-analysis.mozilla.com/rkaiser/crash-report-tools/score/?product=FennecAndroid&version=44.0b11&date=now&limit=30
-  Max 30 entries, for FennecAndroid 44.0b11, 7 days up to the current minute
+  * Max 30 entries, for FennecAndroid 44.0b11, 7 days up to the current minute
 
 * https://crash-analysis.mozilla.com/rkaiser/crash-report-tools/score/?version=44.0b99&limit=30&process=b
-  Max 30 entries, only browser process, for Firefox 44.0 RC (all builds), 7 full UTC days before today
+  * Max 30 entries, only browser process, for Firefox 44.0 RC (all builds), 7 full UTC days before today
 
 * https://crash-analysis.mozilla.com/rkaiser/crash-report-tools/score/?version=46.0b99&buildid=20160421124000&limit=30&date=now
-  Max 30 entries, browser+content processes (default), for the last Firefox 46.0 RC (by specific build IDs), 7 days up to right now
+  * Max 30 entries, browser+content processes (default), for the last Firefox 46.0 RC (by specific build IDs), 7 days up to right now
 
 * https://crash-analysis.mozilla.com/rkaiser/crash-report-tools/score/?version=46.0a1&limit=30&duration=3&date=now
-  Max 30 entries, browser+content processes (default), for Firefox 46.0a1 (current nightly), 3 days up to right now
+  * Max 30 entries, browser+content processes (default), for Firefox 46.0a1 (current nightly), 3 days up to right now
 
 ## Development Notes:
 
