@@ -18,6 +18,7 @@ var gScores = {}, gSocorroAPIToken, gBugInfo = {};
 window.onload = function() {
   gDebug = document.getElementById("debug");
   gLog = document.getElementById("debugLog");
+  // Socorro API token is not required, so the implementation in this code was never finished.
   gSocorroAPIToken = getParameterByName("token");
 
   var product = getParameterByName("product");

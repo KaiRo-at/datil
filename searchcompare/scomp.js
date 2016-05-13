@@ -13,10 +13,13 @@ var gSigData = {}, gSocorroAPIToken, gBugInfo = {};
 
 
 window.onload = function() {
+  // Socorro API token is not required, so the implementation in this code was never finished.
   gSocorroAPIToken = getParameterByName("token");
+  // Fetch Super Search common parameters and specific parameters for query 1 and 2.
   searchCommon = getParameterByName("common");
   searchParam1 = getParameterByName("p1");
   searchParam2 = getParameterByName("p2");
+  // Fetch limits from parameters.
   var limit = getParameterByName("limit");
   if (limit.match(/^(\d+)+$/) && (limit >= 3) && (limit <= 1000)) {
     gLimit = limit;
