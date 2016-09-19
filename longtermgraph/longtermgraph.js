@@ -20,7 +20,7 @@ var gBranches = {
     shorttitle: "Firefox release",
     filenamebase: "Firefox-release-",
     plugins: true,
-    content: false,
+    content: true,
     sumContent: true,
     maxRate: 3,
     maxRate_office: 1.5,
